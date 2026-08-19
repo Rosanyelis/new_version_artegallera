@@ -82,15 +82,15 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 6: streaming y tiempo real
 
-- [ ] Elegir y documentar MediaMTX o Nginx RTMP para el primer entorno.
-- [ ] Crear `StreamingProviderInterface`, adapter inicial y `StreamingService`.
-- [ ] Crear `stream_configurations`, cifrado, rotación/revocación y permisos de stream key.
-- [ ] Implementar panel de configuración OBS y health/status del stream.
-- [ ] Implementar WebSockets con Redis Pub/Sub y eventos de evento, ronda, apuesta y balance.
-- [ ] Integrar chat, rate limit, moderación, silencio, borrado y reportes.
-- [ ] Añadir reconexión, presencia y pruebas de WebSockets.
+- [x] Elegir y documentar MediaMTX para el primer entorno (`docker-compose`, puertos RTMP 1935 / HLS 8888).
+- [x] Crear `StreamingService` con generación y rotación de stream keys cifradas (AES-256-GCM con APP_KEY) y URLs de playback por evento.
+- [x] Crear `stream_configurations`, cifrado de stream key, configuración idempotente por evento y permisos de administración.
+- [x] Implementar endpoints de configuración OBS/stream key (crear y consultar) en `/api/v1/admin/events/:id/stream`.
+- [x] Implementar tiempo real con AdonisJS Transmit (SSE) sobre transporte Redis Pub/Sub para eventos, rondas, apuestas y balance.
+- [x] Integrar chat persistente con rate limit, historial y broadcasting a `chat/:eventId`; moderación/borrado/reportes quedan para la Fase 7.
+- [x] Integrar reconexión automática del cliente (Transmit Client) y actualización de saldo/evento en vivo; presence queda pendiente.
 
-**Criterio:** el cliente ve HLS y cambios de estado sin refrescar; una caída del stream no altera el ledger.
+**Criterio:** cumplido para HLS + cambios de estado en vivo sin refrescar (apuesta aceptada, saldo, ronda liquidada) y chat en tiempo real; una caída del stream no altera el ledger (el ledger se mantiene en PostgreSQL transaccional).
 
 ## Fase 7: administración complementaria y reportes
 

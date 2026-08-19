@@ -7,7 +7,7 @@ Plataforma de eventos, transmisiones y apuestas construida como un monolito modu
 - AdonisJS: backend, API versionada y panel administrativo Edge.
 - React: landing pública en `resources/client`, integrada mediante Vite.
 - PostgreSQL: fuente de verdad para usuarios, apuestas y operaciones financieras.
-- Redis: cache, pub/sub y tiempo real.
+- Redis: cache, pub/sub y transporte del tiempo real (AdonisJS Transmit).
 - MediaMTX: servidor local de desarrollo para RTMP/HLS.
 
 ## Desarrollo
@@ -20,9 +20,9 @@ docker compose up -d
 npm run dev
 ```
 
-La aplicación queda disponible en `http://localhost:3333`. El panel administrativo se implementará bajo `/admin` en la siguiente fase.
+La aplicación queda disponible en `http://localhost:3333`. El panel administrativo opera bajo `/admin`.
 
-El PostgreSQL local usa el puerto `5433` para evitar conflictos con otras instalaciones. El limiter usa memoria en `.env` de desarrollo y Redis debe configurarse como `LIMITER_STORE=redis` en entornos distribuidos.
+El PostgreSQL local usa el puerto `5433` para evitar conflictos con otras instalaciones. El limiter usa memoria en `.env` de desarrollo y Redis debe configurarse como `LIMITER_STORE=redis` en entornos distribuidos. El tiempo real usa el transporte Redis de AdonisJS Transmit (SSE), así que Redis debe estar disponible incluso en desarrollo.
 
 La recuperación de contraseña usa Resend y expone `POST /api/v1/auth/forgot-password` y `POST /api/v1/auth/reset-password`. El API nunca devuelve el token; solo se almacena su hash y vence después de 60 minutos.
 
@@ -32,9 +32,15 @@ El panel operativo Edge está disponible en `/admin` para usuarios con el permis
 
 Las apuestas usan pool por lado y exponen `POST /api/v1/events/:eventId/rounds/:roundId/bets`, `GET /api/v1/bets`, `GET /api/v1/events/:eventId/rounds/:roundId/result` y `POST /api/v1/admin/rounds/:roundId/settle`.
 
-El cliente React requiere sesión para entrar a `/eventos/:slug`. Su alcance se limita a transmisión HLS, saldo, apuestas y chat; la gestión completa permanece en `/admin`. HLS.js se carga bajo demanda y el chat en tiempo real se conectará en la Fase 6.
+El cliente React requiere sesión para entrar a `/eventos/:slug`. Su alcance se limita a transmisión HLS, saldo, apuestas y chat; la gestión completa permanece en `/admin`. HLS.js se carga bajo demanda.
 
-Para ejecutar únicamente el servidor Vite del cliente durante desarrollo:
+### Streaming
+
+La configuración de transmisión por evento (URL de ingest, stream key cifrada y playback HLS) se gestiona desde `POST /api/v1/admin/events/:id/stream` y `GET /api/v1/admin/events/:id/stream` con permiso `events.manage`. El stream key se genera por evento, se cifra con AES-256-GCM (APP_KEY) y solo se expone a operadores autenticados. Para transmitir desde OBS: `rtmp://localhost:1935/live` con el stream key del evento; el playback queda en `http://localhost:8888/live/{slug}/index.m3u8`.
+
+### Tiempo real (chat y estados)
+
+El tiempo real usa AdonisJS Transmit sobre Redis Pub/Sub. El cliente se suscribe a `chat/{eventId}` y `events/{eventId}` mediante SSE con sesión autenticada. Apuestas aceptadas, actualizaciones de balance y rondas liquidadas se emiten a `events/{eventId}`; los mensajes de chat se persisten en `messages` y se difunden a `chat/{eventId}`.
 
 ```sh
 npm run dev:client

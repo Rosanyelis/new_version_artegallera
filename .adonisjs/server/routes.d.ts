@@ -6,6 +6,9 @@ export type ScannedRoutes = {
   ALL: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'client.events': { paramsTuple?: []; params?: {} }
     'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
@@ -25,6 +28,7 @@ export type ScannedRoutes = {
   GET: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'client.events': { paramsTuple?: []; params?: {} }
     'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
@@ -37,6 +41,7 @@ export type ScannedRoutes = {
   HEAD: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'client.events': { paramsTuple?: []; params?: {} }
     'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
@@ -47,6 +52,8 @@ export type ScannedRoutes = {
     'admin.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
   }
   POST: {
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }

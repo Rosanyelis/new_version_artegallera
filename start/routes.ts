@@ -11,9 +11,20 @@ import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import { apiThrottle, authThrottle } from '#start/limiter'
 import router from '@adonisjs/core/services/router'
+import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/health', [() => import('#controllers/health_controller'), 'health']).as('health')
 router.get('/ready', [() => import('#controllers/health_controller'), 'ready']).as('ready')
+
+transmit.authorize<{ eventId: string }>('events/:eventId', async (ctx, { eventId }) => {
+  return Boolean(ctx.auth.user && Number(eventId) > 0)
+})
+transmit.authorize<{ eventId: string }>('chat/:eventId', async (ctx, { eventId }) => {
+  return Boolean(ctx.auth.user && Number(eventId) > 0)
+})
+transmit.registerRoutes((route) => {
+  if (route.getPattern() === '__transmit/subscribe') route.middleware(middleware.apiAuth())
+})
 
 router.on('/').render('pages/home').as('home')
 router
@@ -105,6 +116,14 @@ router
 
 router
   .group(() => {
+    router.get('/', [() => import('#controllers/chat_controller'), 'index'])
+    router.post('/', [() => import('#controllers/chat_controller'), 'store'])
+  })
+  .prefix('/api/v1/events/:eventId/chat')
+  .use([middleware.apiAuth(), apiThrottle])
+
+router
+  .group(() => {
     router.post('/', [() => import('#controllers/event_controller'), 'create'])
     router.post('/:id/state/:action', [() => import('#controllers/event_controller'), 'transition'])
     router.post('/:eventId/rounds', [() => import('#controllers/event_controller'), 'createRound'])
@@ -120,10 +139,21 @@ router
     apiThrottle,
   ])
 
+router.post('/api/v1/admin/rounds/:roundId/settle', [
+  () => import('#controllers/bet_controller'),
+  'settle',
+])
+
 router
-  .post('/api/v1/admin/rounds/:roundId/settle', [
-    () => import('#controllers/bet_controller'),
-    'settle',
+  .group(() => {
+    router.post('/:eventId/stream', [() => import('#controllers/streaming_controller'), 'create'])
+    router.get('/:eventId/stream', [() => import('#controllers/streaming_controller'), 'config'])
+  })
+  .prefix('/api/v1/admin/events')
+  .use([
+    middleware.apiAuth(),
+    middleware.permission({ permissions: ['events.manage'] }),
+    apiThrottle,
   ])
   .use([
     middleware.apiAuth(),

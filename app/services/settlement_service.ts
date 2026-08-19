@@ -2,13 +2,15 @@ import db from '@adonisjs/lucid/services/db'
 import AuditService from '#services/audit_service'
 import WalletService, { parseMoney, formatMoney } from '#services/wallet_service'
 import InvalidStateTransitionError from '#exceptions/state_transition'
+import RealtimeService from '#services/realtime_service'
 
 export default class SettlementService {
   private wallet = new WalletService()
   private audit = new AuditService()
+  private realtime = new RealtimeService()
 
   async settle(roundId: number, actorUserId: number) {
-    return db.transaction(async (trx) => {
+    const result = await db.transaction(async (trx) => {
       const round = await trx.from('rounds').where('id', roundId).forUpdate().first()
       if (!round) return null
 
@@ -96,7 +98,7 @@ export default class SettlementService {
           })
       }
 
-      const [result] = await trx
+      const [roundResult] = await trx
         .table('round_results')
         .insert({
           event_id: round.event_id,
@@ -130,12 +132,18 @@ export default class SettlementService {
         entityType: 'round',
         entityId: roundId,
         newValues: {
-          resultId: result.id,
+          resultId: roundResult.id,
           totalPool: formatMoney(totalPool),
           totalPayout: formatMoney(distributable),
         },
       })
-      return result
+      return roundResult
     })
+    if (!result) return null
+    await this.realtime.event(result.event_id, 'round.settled', {
+      roundId,
+      resultId: result.id,
+    })
+    return result
   }
 }

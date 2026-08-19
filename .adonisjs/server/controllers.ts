@@ -8,10 +8,12 @@ export const controllers = {
   Admin: () => import('#controllers/admin_controller'),
   ApiAuth: () => import('#controllers/api_auth_controller'),
   Bet: () => import('#controllers/bet_controller'),
+  Chat: () => import('#controllers/chat_controller'),
   ClientShell: () => import('#controllers/client_shell_controller'),
   Event: () => import('#controllers/event_controller'),
   Health: () => import('#controllers/health_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
+  Streaming: () => import('#controllers/streaming_controller'),
   Wallet: () => import('#controllers/wallet_controller'),
 }

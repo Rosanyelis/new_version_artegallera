@@ -53,15 +53,16 @@ const shieldConfig = defineConfig({
       '/api/v1/auth/logout',
       '/api/v1/auth/forgot-password',
       '/api/v1/auth/reset-password',
-      '/api/v1/events/*/rounds/*/bets',
-      '/api/v1/admin/rounds/*/settle',
+      '/api/v1/events/:eventId/rounds/:roundId/bets',
+      '/api/v1/admin/rounds/:roundId/settle',
+      '/api/v1/events/:eventId/chat',
     ],
 
     /**
      * Enable XSRF-TOKEN cookie for JavaScript frameworks.
      * When enabled, the CSRF token is available to client-side code.
      */
-    enableXsrfCookie: false,
+    enableXsrfCookie: true,
 
     /**
      * HTTP methods that require CSRF token validation.

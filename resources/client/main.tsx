@@ -10,6 +10,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
+import { Transmit } from '@adonisjs/transmit-client'
 import type Hls from 'hls.js'
 import './styles.css'
 
@@ -42,15 +43,32 @@ type Event = {
   rounds?: Round[]
 }
 type Wallet = { availableBalance: string; heldBalance: string; totalBalance: string }
-type ChatMessage = { name: string; color: string; message: string }
+type ChatMessage = {
+  id: number
+  userId: number
+  name: string
+  content: string
+  createdAt: string
+}
+type ServerChatRow = {
+  id: number
+  user_id: number
+  full_name: string | null
+  email: string
+  content: string
+  created_at: string
+}
+type RealtimeEvent = { type: string } & Record<string, unknown>
 
-const initialChat: ChatMessage[] = [
-  { name: 'ESTEBANR', color: 'gold', message: 'Buena. No me agarra las puestas.' },
-  { name: 'AGPAY', color: 'green', message: 'De cuanto estas apostando?' },
-  { name: 'AGPAY', color: 'green', message: 'Puntos. A ver cual entra.' },
-  { name: 'LOVERA26', color: 'pink', message: 'Me puedes checar mis últimas 2 ganancias?' },
-  { name: 'admin', color: 'red', message: 'Échenle señores, ÚLTIMA PELEA!!!!!' },
-]
+function toChatMessage(row: ServerChatRow): ChatMessage {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    name: row.full_name || row.email || 'Usuario',
+    content: row.content,
+    createdAt: row.created_at,
+  }
+}
 
 async function api<T>(path: string, options: RequestInit = {}) {
   const response = await fetch(path, {
@@ -297,14 +315,24 @@ function ProtectedRoute({
   return children
 }
 
-function ChatPanel() {
-  const [messages, setMessages] = useState(initialChat)
+function ChatPanel({
+  messages,
+  onSend,
+}: {
+  messages: ChatMessage[]
+  onSend: (content: string) => Promise<void>
+}) {
   const [message, setMessage] = useState('')
-  function sendMessage(event: React.FormEvent) {
+  async function sendMessage(event: React.FormEvent) {
     event.preventDefault()
     if (!message.trim()) return
-    setMessages([...messages, { name: 'TÚ', color: 'gold', message: message.trim() }])
+    const content = message.trim()
     setMessage('')
+    try {
+      await onSend(content)
+    } catch {
+      setMessage(content)
+    }
   }
   return (
     <aside className="chat-panel">
@@ -312,9 +340,10 @@ function ChatPanel() {
         CHAT <span>EN VIVO</span>
       </div>
       <div className="chat-messages">
-        {messages.map((item, index) => (
-          <p key={`${item.name}-${index}`}>
-            <strong className={item.color}>{item.name}:</strong> {item.message}
+        {messages.length === 0 && <p className="chat-empty">Sé el primero en escribir.</p>}
+        {messages.map((item) => (
+          <p key={item.id}>
+            <strong>{item.name}:</strong> {item.content}
           </p>
         ))}
       </div>
@@ -461,19 +490,64 @@ function EventRoom({ user }: { user: User }) {
     heldBalance: '0.00',
     totalBalance: '0.00',
   })
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [error, setError] = useState('')
   useEffect(() => {
+    let cancelled = false
+    let transmit: Transmit | null = null
     Promise.all([api<Event>(`/api/v1/events/${slug}`), api<Wallet>('/api/v1/wallet')])
-      .then(([loadedEvent, loadedWallet]) => {
+      .then(async ([loadedEvent, loadedWallet]) => {
+        if (cancelled) return
         setEvent(loadedEvent)
         setWallet(loadedWallet)
+        const history = await api<ServerChatRow[]>(
+          `/api/v1/events/${loadedEvent.id}/chat`
+        ).catch(() => [])
+        if (cancelled) return
+        setMessages(history.slice(0, 50).reverse().map(toChatMessage))
+        transmit = new Transmit({ baseUrl: '' })
+        const chatChannel = `chat/${loadedEvent.id}`
+        const eventChannel = `events/${loadedEvent.id}`
+        transmit.subscription(chatChannel).onMessage<ChatMessage>((message) => {
+          setMessages((current) =>
+            current.some((item) => item.id === message.id)
+              ? current
+              : [...current, message].slice(-100)
+          )
+        })
+        transmit.subscription(eventChannel).onMessage<RealtimeEvent>((message) => {
+          if (message.type === 'balance.updated' || message.type === 'bet.accepted') {
+            api<Wallet>('/api/v1/wallet').then(setWallet).catch(() => undefined)
+          }
+          if (message.type === 'round.settled') {
+            api<Event>(`/api/v1/events/${slug}`).then(setEvent).catch(() => undefined)
+          }
+        })
+        await transmit.subscription(chatChannel).create()
+        await transmit.subscription(eventChannel).create()
       })
       .catch((requestError) =>
         setError(
           requestError instanceof Error ? requestError.message : 'No se pudo cargar el evento.'
         )
       )
+    return () => {
+      cancelled = true
+      transmit?.close()
+    }
   }, [slug])
+  async function sendChat(content: string) {
+    if (!event) throw new Error('El evento no está disponible.')
+    const created = await api<ChatMessage>(`/api/v1/events/${event.id}/chat`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    })
+    setMessages((current) =>
+      current.some((item) => item.id === created.id)
+        ? current
+        : [...current, created].slice(-100)
+    )
+  }
   if (error) return <div className="loading-state">{error}</div>
   if (!event) return <div className="loading-state">Cargando evento...</div>
   const currentEvent = event
@@ -518,7 +592,7 @@ function EventRoom({ user }: { user: User }) {
           <em>{round?.status || 'pending'}</em>
         </div>
       </main>
-      <ChatPanel />
+      <ChatPanel messages={messages} onSend={sendChat} />
       <p className="room-user-note">Sesión activa: {user.email}</p>
     </section>
   )

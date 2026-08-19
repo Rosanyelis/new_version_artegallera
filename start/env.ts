@@ -48,4 +48,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   RESEND_API_KEY: Env.schema.secret.optional(),
   RESEND_FROM_EMAIL: Env.schema.string({ format: 'email' }),
   RESEND_FROM_NAME: Env.schema.string(),
+
+  // Streaming
+  STREAMING_PROVIDER: Env.schema.string(),
+  STREAMING_INGEST_URL: Env.schema.string(),
+  STREAMING_PLAYBACK_BASE_URL: Env.schema.string({ format: 'url', tld: false }),
 })

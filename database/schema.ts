@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuditLogSchema extends BaseModel {
-  static $columns = [
-    'action',
-    'createdAt',
-    'entityId',
-    'entityType',
-    'id',
-    'ipAddress',
-    'newValues',
-    'oldValues',
-    'userAgent',
-    'userId',
-  ] as const
+  static $columns = ['action', 'createdAt', 'entityId', 'entityType', 'id', 'ipAddress', 'newValues', 'oldValues', 'userAgent', 'userId'] as const
   $columns = AuditLogSchema.$columns
   @column()
   declare action: string
@@ -44,24 +33,7 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class BetSchema extends BaseModel {
-  static $columns = [
-    'amount',
-    'bettingSideId',
-    'createdAt',
-    'eventId',
-    'id',
-    'idempotencyKey',
-    'metadata',
-    'payoutAmount',
-    'placedAt',
-    'reference',
-    'roundId',
-    'settledAt',
-    'status',
-    'transactionId',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['amount', 'bettingSideId', 'createdAt', 'eventId', 'id', 'idempotencyKey', 'metadata', 'payoutAmount', 'placedAt', 'reference', 'roundId', 'settledAt', 'status', 'transactionId', 'updatedAt', 'userId'] as const
   $columns = BetSchema.$columns
   @column()
   declare amount: string
@@ -98,17 +70,7 @@ export class BetSchema extends BaseModel {
 }
 
 export class BettingSideSchema extends BaseModel {
-  static $columns = [
-    'code',
-    'color',
-    'createdAt',
-    'eventId',
-    'id',
-    'metadata',
-    'name',
-    'roundId',
-    'updatedAt',
-  ] as const
+  static $columns = ['code', 'color', 'createdAt', 'eventId', 'id', 'metadata', 'name', 'roundId', 'updatedAt'] as const
   $columns = BettingSideSchema.$columns
   @column()
   declare code: string
@@ -131,22 +93,7 @@ export class BettingSideSchema extends BaseModel {
 }
 
 export class EventSchema extends BaseModel {
-  static $columns = [
-    'bettingStatus',
-    'coverImage',
-    'createdAt',
-    'description',
-    'id',
-    'isFeatured',
-    'location',
-    'name',
-    'playbackUrl',
-    'scheduledAt',
-    'slug',
-    'status',
-    'streamStatus',
-    'updatedAt',
-  ] as const
+  static $columns = ['bettingStatus', 'coverImage', 'createdAt', 'description', 'id', 'isFeatured', 'location', 'name', 'playbackUrl', 'scheduledAt', 'slug', 'status', 'streamStatus', 'updatedAt'] as const
   $columns = EventSchema.$columns
   @column()
   declare bettingStatus: string
@@ -176,6 +123,29 @@ export class EventSchema extends BaseModel {
   declare streamStatus: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class MessageSchema extends BaseModel {
+  static $columns = ['content', 'createdAt', 'eventId', 'id', 'messageType', 'moderatedAt', 'moderatedBy', 'status', 'userId'] as const
+  $columns = MessageSchema.$columns
+  @column()
+  declare content: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare eventId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare messageType: string
+  @column.dateTime()
+  declare moderatedAt: DateTime | null
+  @column()
+  declare moderatedBy: number | null
+  @column()
+  declare status: string
+  @column()
+  declare userId: number
 }
 
 export class PasswordResetTokenSchema extends BaseModel {
@@ -239,20 +209,7 @@ export class RoleSchema extends BaseModel {
 }
 
 export class RoundResultSchema extends BaseModel {
-  static $columns = [
-    'eventId',
-    'greenTotal',
-    'houseCommission',
-    'id',
-    'metadata',
-    'redTotal',
-    'roundId',
-    'settledAt',
-    'totalPayout',
-    'totalPool',
-    'totalWinners',
-    'winningSideId',
-  ] as const
+  static $columns = ['eventId', 'greenTotal', 'houseCommission', 'id', 'metadata', 'redTotal', 'roundId', 'settledAt', 'totalPayout', 'totalPool', 'totalWinners', 'winningSideId'] as const
   $columns = RoundResultSchema.$columns
   @column()
   declare eventId: number
@@ -281,23 +238,7 @@ export class RoundResultSchema extends BaseModel {
 }
 
 export class RoundSchema extends BaseModel {
-  static $columns = [
-    'bettingClosedAt',
-    'bettingStatus',
-    'createdAt',
-    'eventId',
-    'finishedAt',
-    'id',
-    'openedAt',
-    'roundNumber',
-    'startedAt',
-    'status',
-    'totalGreen',
-    'totalPool',
-    'totalRed',
-    'updatedAt',
-    'winningSideId',
-  ] as const
+  static $columns = ['bettingClosedAt', 'bettingStatus', 'createdAt', 'eventId', 'finishedAt', 'id', 'openedAt', 'roundNumber', 'startedAt', 'status', 'totalGreen', 'totalPool', 'totalRed', 'updatedAt', 'winningSideId'] as const
   $columns = RoundSchema.$columns
   @column.dateTime()
   declare bettingClosedAt: DateTime | null
@@ -331,6 +272,35 @@ export class RoundSchema extends BaseModel {
   declare winningSideId: number | null
 }
 
+export class StreamConfigurationSchema extends BaseModel {
+  static $columns = ['createdAt', 'endedAt', 'eventId', 'id', 'ingestUrl', 'metadata', 'playbackUrl', 'provider', 'startedAt', 'status', 'streamKeyEncrypted', 'updatedAt'] as const
+  $columns = StreamConfigurationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare endedAt: DateTime | null
+  @column()
+  declare eventId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare ingestUrl: string
+  @column()
+  declare metadata: any | null
+  @column()
+  declare playbackUrl: string
+  @column()
+  declare provider: string
+  @column.dateTime()
+  declare startedAt: DateTime | null
+  @column()
+  declare status: string
+  @column()
+  declare streamKeyEncrypted: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserRoleSchema extends BaseModel {
   static $columns = ['createdAt', 'roleId', 'updatedAt', 'userId'] as const
   $columns = UserRoleSchema.$columns
@@ -345,18 +315,7 @@ export class UserRoleSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'email',
-    'fullName',
-    'id',
-    'isBettingEnabled',
-    'lastAccessAt',
-    'password',
-    'status',
-    'updatedAt',
-    'username',
-  ] as const
+  static $columns = ['createdAt', 'email', 'fullName', 'id', 'isBettingEnabled', 'lastAccessAt', 'password', 'status', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -381,21 +340,7 @@ export class UserSchema extends BaseModel {
 }
 
 export class WalletTransactionSchema extends BaseModel {
-  static $columns = [
-    'amount',
-    'balanceAfter',
-    'balanceBefore',
-    'createdAt',
-    'description',
-    'id',
-    'idempotencyKey',
-    'metadata',
-    'reference',
-    'status',
-    'type',
-    'userId',
-    'walletId',
-  ] as const
+  static $columns = ['amount', 'balanceAfter', 'balanceBefore', 'createdAt', 'description', 'id', 'idempotencyKey', 'metadata', 'reference', 'status', 'type', 'userId', 'walletId'] as const
   $columns = WalletTransactionSchema.$columns
   @column()
   declare amount: string
@@ -426,14 +371,7 @@ export class WalletTransactionSchema extends BaseModel {
 }
 
 export class WalletSchema extends BaseModel {
-  static $columns = [
-    'availableBalance',
-    'createdAt',
-    'heldBalance',
-    'id',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['availableBalance', 'createdAt', 'heldBalance', 'id', 'updatedAt', 'userId'] as const
   $columns = WalletSchema.$columns
   @column()
   declare availableBalance: string

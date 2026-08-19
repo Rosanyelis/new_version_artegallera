@@ -3,6 +3,7 @@ import AuditService from '#services/audit_service'
 import WalletService, { parseMoney, formatMoney } from '#services/wallet_service'
 import { BettingClosedError, InvalidBetError } from '#exceptions/betting'
 import { IdempotencyConflictError } from '#exceptions/wallet'
+import RealtimeService from '#services/realtime_service'
 
 type PlaceBetOptions = {
   idempotencyKey: string
@@ -15,6 +16,7 @@ type PlaceBetOptions = {
 export default class BettingService {
   private wallet = new WalletService()
   private audit = new AuditService()
+  private realtime = new RealtimeService()
 
   async placeBet(
     userId: number,
@@ -24,7 +26,7 @@ export default class BettingService {
     amount: string,
     options: PlaceBetOptions
   ) {
-    return db.transaction(async (trx) => {
+    const betRecord = await db.transaction(async (trx) => {
       const round = await trx
         .from('rounds')
         .where({ id: roundId, event_id: eventId })
@@ -91,19 +93,30 @@ export default class BettingService {
         metadata: options.metadata || null,
         created_at: new Date(),
       })
-      const bet = await trx.from('bets').where('idempotency_key', options.idempotencyKey).first()
+      const insertedBet = await trx
+        .from('bets')
+        .where('idempotency_key', options.idempotencyKey)
+        .first()
       await this.audit.record({
         trx,
         userId,
         action: 'bet.created',
         entityType: 'bet',
-        entityId: bet.id,
+        entityId: insertedBet.id,
         newValues: { amount: formatMoney(amountCents), eventId, roundId, bettingSideId },
         ipAddress: options.ipAddress,
         userAgent: options.userAgent,
       })
-      return bet
+      return insertedBet
     })
+    await this.realtime.event(eventId, 'bet.accepted', {
+      roundId,
+      betId: betRecord.id,
+      bettingSideId,
+      amount: betRecord.amount,
+    })
+    await this.realtime.event(eventId, 'balance.updated', { userId, roundId })
+    return betRecord
   }
 
   async listUserBets(userId: number, limit = 50) {
