@@ -30,15 +30,15 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 2: wallet, ledger y auditoría
 
-- [ ] Crear migraciones de `wallets` y `wallet_transactions` con DECIMAL, constraints e índices.
-- [ ] Implementar `WalletService` con débito, crédito, refund, reversal y ajuste autorizado.
-- [ ] Garantizar locking, balance before/after, referencias e idempotencia.
-- [ ] Impedir deletes/updates del ledger desde la aplicación.
-- [ ] Implementar `audit_logs` para operaciones financieras y administrativas críticas.
-- [ ] Crear endpoints de saldo, movimientos e historial para cliente y panel.
-- [ ] Añadir tests de saldo insuficiente, rollback, reintento y dos operaciones simultáneas.
+- [x] Crear migraciones de `wallets` y `wallet_transactions` con DECIMAL, constraints e índices.
+- [x] Implementar `WalletService` con débito, crédito, refund, reversal y ajuste autorizado.
+- [x] Garantizar locking, balance before/after, referencias e idempotencia.
+- [x] Impedir deletes/updates del ledger desde la aplicación y mediante trigger PostgreSQL.
+- [x] Implementar `audit_logs` para operaciones financieras y administrativas críticas.
+- [x] Crear endpoints de saldo, movimientos e historial para cliente y ajustes del panel.
+- [x] Añadir tests de saldo insuficiente, rollback, reintento y dos operaciones simultáneas.
 
-**Criterio:** ninguna operación concurrente puede producir saldo negativo o doble crédito; toda modificación es auditable.
+**Criterio:** cumplido; las operaciones financieras usan DECIMAL, locking, idempotencia, ledger inmutable y auditoría transaccional.
 
 ## Fase 3: eventos, rondas y panel operativo
 

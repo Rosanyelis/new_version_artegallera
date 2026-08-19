@@ -9,4 +9,5 @@ export const controllers = {
   Health: () => import('#controllers/health_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
+  Wallet: () => import('#controllers/wallet_controller'),
 }

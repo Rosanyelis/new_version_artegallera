@@ -59,6 +59,22 @@ router
   .use([middleware.apiAuth(), apiThrottle])
 
 router
+  .group(() => {
+    router.get('/', [() => import('#controllers/wallet_controller'), 'balance'])
+    router.get('/transactions', [() => import('#controllers/wallet_controller'), 'transactions'])
+  })
+  .prefix('/api/v1/wallet')
+  .use([middleware.apiAuth(), apiThrottle])
+
+router
+  .post('/api/v1/admin/wallets/adjust', [() => import('#controllers/wallet_controller'), 'adjust'])
+  .use([
+    middleware.apiAuth(),
+    middleware.permission({ permissions: ['wallets.manage'] }),
+    apiThrottle,
+  ])
+
+router
   .get('/api/v1/admin/access-check', [
     () => import('#controllers/admin_access_controller'),
     'check',

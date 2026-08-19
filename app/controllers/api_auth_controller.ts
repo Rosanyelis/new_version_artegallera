@@ -7,6 +7,7 @@ import {
   resetPasswordValidator,
 } from '#validators/api_auth'
 import EmailService from '#services/email_service'
+import WalletService from '#services/wallet_service'
 import type { HttpContext } from '@adonisjs/core/http'
 import { errors } from '@adonisjs/auth'
 import db from '@adonisjs/lucid/services/db'
@@ -25,6 +26,7 @@ export default class ApiAuthController {
     if (defaultRole) {
       await user.related('roles').attach([defaultRole.id])
     }
+    await new WalletService().ensureWallet(user.id)
 
     await auth.use('web').login(user)
     return response.created({ data: this.serializeUser(user) })

@@ -7,6 +7,42 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AuditLogSchema extends BaseModel {
+  static $columns = [
+    'action',
+    'createdAt',
+    'entityId',
+    'entityType',
+    'id',
+    'ipAddress',
+    'newValues',
+    'oldValues',
+    'userAgent',
+    'userId',
+  ] as const
+  $columns = AuditLogSchema.$columns
+  @column()
+  declare action: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare entityId: string
+  @column()
+  declare entityType: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare ipAddress: string | null
+  @column()
+  declare newValues: any | null
+  @column()
+  declare oldValues: any | null
+  @column()
+  declare userAgent: string | null
+  @column()
+  declare userId: number | null
+}
+
 export class PasswordResetTokenSchema extends BaseModel {
   static $columns = ['createdAt', 'expiresAt', 'id', 'tokenHash', 'usedAt', 'userId'] as const
   $columns = PasswordResetTokenSchema.$columns
@@ -114,4 +150,73 @@ export class UserSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare username: string | null
+}
+
+export class WalletTransactionSchema extends BaseModel {
+  static $columns = [
+    'amount',
+    'balanceAfter',
+    'balanceBefore',
+    'createdAt',
+    'description',
+    'id',
+    'idempotencyKey',
+    'metadata',
+    'reference',
+    'status',
+    'type',
+    'userId',
+    'walletId',
+  ] as const
+  $columns = WalletTransactionSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare balanceAfter: string
+  @column()
+  declare balanceBefore: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare idempotencyKey: string
+  @column()
+  declare metadata: any | null
+  @column()
+  declare reference: string | null
+  @column()
+  declare status: string
+  @column()
+  declare type: string
+  @column()
+  declare userId: number
+  @column()
+  declare walletId: number
+}
+
+export class WalletSchema extends BaseModel {
+  static $columns = [
+    'availableBalance',
+    'createdAt',
+    'heldBalance',
+    'id',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = WalletSchema.$columns
+  @column()
+  declare availableBalance: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare heldBalance: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
 }

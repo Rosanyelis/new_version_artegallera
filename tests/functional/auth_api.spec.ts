@@ -1,6 +1,8 @@
 import { test } from '@japa/runner'
 import User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
+import WalletService from '#services/wallet_service'
+import { InsufficientFundsError } from '#exceptions/wallet'
 import { createHash, randomBytes } from 'node:crypto'
 import { DateTime } from 'luxon'
 
@@ -104,5 +106,82 @@ test.group('Authentication API', () => {
       }),
     })
     assert.equal(reused.status, 422)
+  })
+
+  test('credits, debits and replays an operation idempotently', async ({ assert }) => {
+    const user = await User.create({
+      fullName: 'Wallet User',
+      email: `wallet-${Date.now()}@example.com`,
+      password: 'WalletPassword123!',
+      status: 'active',
+      isBettingEnabled: false,
+    })
+    const wallet = new WalletService()
+    await wallet.ensureWallet(user.id)
+
+    const first = await wallet.credit(user.id, '100.00', {
+      idempotencyKey: `credit-${user.id}-${Date.now()}`,
+    })
+    const replay = await wallet.credit(user.id, '100.00', {
+      idempotencyKey: first.idempotency_key,
+    })
+    await wallet.debit(user.id, '35.25', {
+      idempotencyKey: `debit-${user.id}-${Date.now()}`,
+    })
+
+    assert.equal(replay.id, first.id)
+    assert.deepEqual(await wallet.getBalance(user.id), {
+      availableBalance: '64.75',
+      heldBalance: '0.00',
+      totalBalance: '64.75',
+    })
+    const transactionCount = await db
+      .from('wallet_transactions')
+      .where('user_id', user.id)
+      .count('* as total')
+      .first()
+    assert.equal(transactionCount.total, '2')
+  })
+
+  test('does not mutate balance when a debit lacks funds', async ({ assert }) => {
+    const user = await User.create({
+      fullName: 'Insufficient User',
+      email: `insufficient-${Date.now()}@example.com`,
+      password: 'WalletPassword123!',
+      status: 'active',
+      isBettingEnabled: false,
+    })
+    const wallet = new WalletService()
+    await wallet.ensureWallet(user.id)
+
+    await assert.rejects(
+      () => wallet.debit(user.id, '1.00', { idempotencyKey: `debit-${user.id}-${Date.now()}` }),
+      InsufficientFundsError
+    )
+    const balance = await wallet.getBalance(user.id)
+    assert.equal(balance.availableBalance, '0.00')
+  })
+
+  test('serializes concurrent debits with a row lock', async ({ assert }) => {
+    const user = await User.create({
+      fullName: 'Concurrent Wallet User',
+      email: `concurrent-${Date.now()}@example.com`,
+      password: 'WalletPassword123!',
+      status: 'active',
+      isBettingEnabled: false,
+    })
+    const wallet = new WalletService()
+    await wallet.ensureWallet(user.id)
+    await wallet.credit(user.id, '10.00', { idempotencyKey: `credit-${user.id}-${Date.now()}` })
+
+    const results = await Promise.allSettled([
+      wallet.debit(user.id, '10.00', { idempotencyKey: `debit-a-${user.id}-${Date.now()}` }),
+      wallet.debit(user.id, '10.00', { idempotencyKey: `debit-b-${user.id}-${Date.now()}` }),
+    ])
+
+    assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1)
+    assert.equal(results.filter((result) => result.status === 'rejected').length, 1)
+    const balance = await wallet.getBalance(user.id)
+    assert.equal(balance.availableBalance, '0.00')
   })
 })
