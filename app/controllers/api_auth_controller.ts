@@ -20,7 +20,7 @@ import { appUrl } from '#config/app'
 export default class ApiAuthController {
   async register({ request, auth, response }: HttpContext) {
     const payload = await request.validateUsing(apiSignupValidator)
-    const user = await User.create({ ...payload, status: 'active', isBettingEnabled: false })
+    const user = await User.create({ ...payload, status: 'active', isBettingEnabled: true })
     const defaultRole = await Role.findBy('code', 'user')
 
     if (defaultRole) {

@@ -46,7 +46,7 @@ Vistas Edge bajo `/admin` con policies por permiso. Incluirá dashboard, CRUD op
 
 ### Landing React
 
-`resources/client` tendrá las páginas de inicio, listado/detalle de eventos, autenticación, wallet, mis apuestas y perfil. Usará React Router para navegación y un cliente HTTP tipado hacia `/api/v1`; se recomienda TanStack Query para cache/invalidation y un cliente WebSocket para eventos en vivo. React no calculará premios ni decidirá si una apuesta es válida.
+`resources/client` tendrá únicamente la experiencia del cliente: inicio, listado/detalle de eventos, login/registro y sala autenticada de evento. La sala permitirá ver HLS, consultar saldo, apostar y usar chat; no gestionará eventos, rondas, resultados, wallets administrativas ni streaming. Usará React Router y un cliente HTTP hacia `/api/v1`; los premios y reglas de apuesta siempre permanecerán en AdonisJS.
 
 ## 3. Modelo de datos inicial
 

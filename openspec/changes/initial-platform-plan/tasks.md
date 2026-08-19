@@ -64,18 +64,21 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 **Criterio:** cumplido para el modelo MVP de pool; toda apuesta aceptada tiene débito/ledger, la liquidación es idempotente y los premios se acreditan sin duplicación.
 
-## Fase 5: landing React para clientes
+## Fase 5: cliente React para eventos
 
-- [ ] Crear sistema visual responsive mobile-first y layout público.
-- [ ] Implementar home, eventos, detalle de evento, login/registro y recuperación.
-- [ ] Implementar player HLS, estado LIVE, ronda activa y estado independiente de apuestas.
-- [ ] Implementar selector de lado, monto, confirmación y errores de negocio comprensibles.
-- [ ] Implementar saldo, historial de apuestas, movimientos y resultados anteriores.
-- [ ] Implementar cliente API tipado, cache/invalidation y guards de autenticación.
-- [ ] Implementar estados de carga, vacío, error, offline y reconexión.
-- [ ] Añadir tests de componentes y flujo de apuesta con API simulada.
+- [x] Crear sistema visual responsive mobile-first basado en la referencia del cliente.
+- [x] Implementar home, listado de eventos, sala de evento y login/registro.
+- [x] Proteger la sala de evento y las apuestas mediante sesión API.
+- [x] Implementar player HLS con fallback nativo, estado LIVE, ronda activa y estado independiente de apuestas.
+- [x] Implementar selector de lado, monto, confirmación y errores de negocio comprensibles.
+- [x] Implementar saldo disponible visible y actualización después de apostar.
+- [x] Implementar cliente HTTP y guards de autenticación.
+- [x] Implementar estados de carga, vacío y error.
+- [x] Implementar la interfaz de chat cliente y estados de carga de conversación.
+- [x] Añadir tests de componentes para controles de apuesta.
+- [ ] Integrar WebSockets/Redis para chat y estados en tiempo real en la Fase 6.
 
-**Criterio:** un cliente puede completar el flujo completo desde la landing sin conocer reglas internas ni credenciales de streaming.
+**Criterio:** cumplido para acceso autenticado, transmisión HLS, saldo, apuesta, interfaz de chat y responsive; la sincronización en tiempo real queda para la Fase 6.
 
 ## Fase 6: streaming y tiempo real
 

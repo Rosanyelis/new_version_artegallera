@@ -32,6 +32,8 @@ El panel operativo Edge está disponible en `/admin` para usuarios con el permis
 
 Las apuestas usan pool por lado y exponen `POST /api/v1/events/:eventId/rounds/:roundId/bets`, `GET /api/v1/bets`, `GET /api/v1/events/:eventId/rounds/:roundId/result` y `POST /api/v1/admin/rounds/:roundId/settle`.
 
+El cliente React requiere sesión para entrar a `/eventos/:slug`. Su alcance se limita a transmisión HLS, saldo, apuestas y chat; la gestión completa permanece en `/admin`. HLS.js se carga bajo demanda y el chat en tiempo real se conectará en la Fase 6.
+
 Para ejecutar únicamente el servidor Vite del cliente durante desarrollo:
 
 ```sh

@@ -7,9 +7,12 @@ export type ScannedRoutes = {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
+    'client.events': { paramsTuple?: []; params?: {} }
+    'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'session.create': { paramsTuple?: []; params?: {} }
+    'client.register': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
@@ -23,8 +26,11 @@ export type ScannedRoutes = {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
+    'client.events': { paramsTuple?: []; params?: {} }
+    'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'client.register': { paramsTuple?: []; params?: {} }
+    'new_account.create': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
   }
@@ -32,8 +38,11 @@ export type ScannedRoutes = {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
+    'client.events': { paramsTuple?: []; params?: {} }
+    'client.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'client.register': { paramsTuple?: []; params?: {} }
+    'new_account.create': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
   }

@@ -16,13 +16,24 @@ router.get('/health', [() => import('#controllers/health_controller'), 'health']
 router.get('/ready', [() => import('#controllers/health_controller'), 'ready']).as('ready')
 
 router.on('/').render('pages/home').as('home')
+router
+  .get('/eventos', [() => import('#controllers/client_shell_controller'), 'show'])
+  .as('client.events')
+router
+  .get('/eventos/:slug', [() => import('#controllers/client_shell_controller'), 'show'])
+  .as('client.event')
+router
+  .get('/login', [() => import('#controllers/client_shell_controller'), 'show'])
+  .as('session.create')
+router
+  .get('/registro', [() => import('#controllers/client_shell_controller'), 'show'])
+  .as('client.register')
 
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
     router.post('signup', [controllers.NewAccount, 'store'])
 
-    router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
   })
   .use(middleware.guest())
