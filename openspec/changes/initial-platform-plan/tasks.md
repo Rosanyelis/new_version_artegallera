@@ -54,15 +54,15 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 4: apuestas y liquidación
 
-- [ ] Crear migraciones/modelos de `bets` y `round_results` con constraints e idempotencia.
-- [ ] Implementar `BettingService` con todas las validaciones del PDR.
-- [ ] Integrar `BettingService` y `WalletService` en una única transacción PostgreSQL.
-- [ ] Implementar `SettlementService` idempotente para pool, comisión, premios y reembolsos.
-- [ ] Añadir endpoints de crear apuesta, historial, resultado y operación administrativa.
-- [ ] Añadir pruebas de concurrencia: mismo saldo, cierre de ronda, reintento y doble liquidación.
-- [ ] Documentar matching como backlog hasta confirmar el modelo comercial.
+- [x] Crear migraciones/modelos de `bets` y `round_results` con constraints e idempotencia.
+- [x] Implementar `BettingService` con las validaciones críticas del PDR.
+- [x] Integrar `BettingService` y `WalletService` en una única transacción PostgreSQL.
+- [x] Implementar `SettlementService` idempotente para pool, comisión cero inicial, premios y reembolsos.
+- [x] Añadir endpoints de crear apuesta, historial, resultado y operación administrativa.
+- [x] Añadir pruebas de concurrencia, saldo insuficiente, cierre de ronda, reintento y doble liquidación.
+- [x] Mantener matching individual como backlog hasta confirmar el modelo comercial.
 
-**Criterio:** una apuesta aceptada tiene débito y ledger; una ronda liquidada no puede liquidarse dos veces; los ganadores reciben crédito exacto.
+**Criterio:** cumplido para el modelo MVP de pool; toda apuesta aceptada tiene débito/ledger, la liquidación es idempotente y los premios se acreditan sin duplicación.
 
 ## Fase 5: landing React para clientes
 

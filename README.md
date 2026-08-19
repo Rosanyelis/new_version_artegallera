@@ -30,6 +30,8 @@ La wallet expone `GET /api/v1/wallet` y `GET /api/v1/wallet/transactions`. Los a
 
 El panel operativo Edge está disponible en `/admin` para usuarios con el permiso `admin.access`. Desde allí se crean eventos, rondas y se ejecutan sus transiciones operativas.
 
+Las apuestas usan pool por lado y exponen `POST /api/v1/events/:eventId/rounds/:roundId/bets`, `GET /api/v1/bets`, `GET /api/v1/events/:eventId/rounds/:roundId/result` y `POST /api/v1/admin/rounds/:roundId/settle`.
+
 Para ejecutar únicamente el servidor Vite del cliente durante desarrollo:
 
 ```sh

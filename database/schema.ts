@@ -43,6 +43,60 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BetSchema extends BaseModel {
+  static $columns = [
+    'amount',
+    'bettingSideId',
+    'createdAt',
+    'eventId',
+    'id',
+    'idempotencyKey',
+    'metadata',
+    'payoutAmount',
+    'placedAt',
+    'reference',
+    'roundId',
+    'settledAt',
+    'status',
+    'transactionId',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = BetSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare bettingSideId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare eventId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare idempotencyKey: string
+  @column()
+  declare metadata: any | null
+  @column()
+  declare payoutAmount: string
+  @column.dateTime()
+  declare placedAt: DateTime
+  @column()
+  declare reference: string | null
+  @column()
+  declare roundId: number
+  @column.dateTime()
+  declare settledAt: DateTime | null
+  @column()
+  declare status: string
+  @column()
+  declare transactionId: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class BettingSideSchema extends BaseModel {
   static $columns = [
     'code',
@@ -182,6 +236,48 @@ export class RoleSchema extends BaseModel {
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class RoundResultSchema extends BaseModel {
+  static $columns = [
+    'eventId',
+    'greenTotal',
+    'houseCommission',
+    'id',
+    'metadata',
+    'redTotal',
+    'roundId',
+    'settledAt',
+    'totalPayout',
+    'totalPool',
+    'totalWinners',
+    'winningSideId',
+  ] as const
+  $columns = RoundResultSchema.$columns
+  @column()
+  declare eventId: number
+  @column()
+  declare greenTotal: string
+  @column()
+  declare houseCommission: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare metadata: any | null
+  @column()
+  declare redTotal: string
+  @column()
+  declare roundId: number
+  @column.dateTime()
+  declare settledAt: DateTime
+  @column()
+  declare totalPayout: string
+  @column()
+  declare totalPool: string
+  @column()
+  declare totalWinners: number
+  @column()
+  declare winningSideId: number
 }
 
 export class RoundSchema extends BaseModel {

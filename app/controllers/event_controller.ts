@@ -1,11 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import EventService, { type EventStatus } from '#services/event_service'
 import RoundService, { type RoundStatus } from '#services/round_service'
+import SettlementService from '#services/settlement_service'
 import { eventCreateValidator, roundCreateValidator, roundResultValidator } from '#validators/event'
 
 export default class EventController {
   private events = new EventService()
   private rounds = new RoundService()
+  private settlement = new SettlementService()
 
   async index({ response }: HttpContext) {
     return response.ok({ data: await this.events.listPublic() })
@@ -50,6 +52,15 @@ export default class EventController {
   }
 
   async transitionRound({ auth, params, request, response }: HttpContext) {
+    if (params.action === 'settled') {
+      const result = await this.settlement.settle(Number(params.id), auth.user!.id)
+      if (!result)
+        return response.notFound({
+          error: { code: 'ROUND_NOT_FOUND', message: 'Ronda no encontrada.' },
+        })
+      return response.ok({ data: result })
+    }
+
     let winningSideId: number | undefined
     if (params.action === 'settling') {
       const result = await request.validateUsing(roundResultValidator)

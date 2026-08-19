@@ -53,6 +53,8 @@ const shieldConfig = defineConfig({
       '/api/v1/auth/logout',
       '/api/v1/auth/forgot-password',
       '/api/v1/auth/reset-password',
+      '/api/v1/events/*/rounds/*/bets',
+      '/api/v1/admin/rounds/*/settle',
     ],
 
     /**

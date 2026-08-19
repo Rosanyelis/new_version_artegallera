@@ -10,9 +10,9 @@ import {
 
 export type WalletOperationType =
   'deposit' | 'withdrawal' | 'bet' | 'win' | 'refund' | 'adjustment' | 'commission' | 'reversal'
-type Direction = 'credit' | 'debit'
+export type WalletDirection = 'credit' | 'debit'
 
-type OperationOptions = {
+export type OperationOptions = {
   idempotencyKey: string
   reference?: string | null
   description?: string | null
@@ -20,6 +20,21 @@ type OperationOptions = {
   actorUserId?: number | null
   ipAddress?: string | null
   userAgent?: string | null
+}
+
+export function parseMoney(value: string | number) {
+  const normalized = String(value)
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
+    throw new WalletError('El monto monetario no es válido.')
+  }
+  const [whole, fraction = ''] = normalized.split('.')
+  return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'))
+}
+
+export function formatMoney(cents: bigint) {
+  const sign = cents < 0n ? '-' : ''
+  const absolute = cents < 0n ? -cents : cents
+  return `${sign}${absolute / 100n}.${(absolute % 100n).toString().padStart(2, '0')}`
 }
 
 export default class WalletService {
@@ -35,12 +50,12 @@ export default class WalletService {
       return { availableBalance: '0.00', heldBalance: '0.00', totalBalance: '0.00' }
     }
 
-    const available = this.parseMoney(wallet.available_balance)
-    const held = this.parseMoney(wallet.held_balance)
+    const available = parseMoney(wallet.available_balance)
+    const held = parseMoney(wallet.held_balance)
     return {
-      availableBalance: this.formatMoney(available),
-      heldBalance: this.formatMoney(held),
-      totalBalance: this.formatMoney(available + held),
+      availableBalance: formatMoney(available),
+      heldBalance: formatMoney(held),
+      totalBalance: formatMoney(available + held),
     }
   }
 
@@ -63,11 +78,36 @@ export default class WalletService {
     return this.mutate(userId, amount, 'debit', 'withdrawal', options)
   }
 
+  async creditInTransaction(
+    trx: TransactionClientContract,
+    userId: number,
+    amount: string,
+    type: WalletOperationType,
+    options: OperationOptions
+  ) {
+    return this.mutateInTransaction(trx, userId, amount, 'credit', type, options)
+  }
+
+  async debitInTransaction(
+    trx: TransactionClientContract,
+    userId: number,
+    amount: string,
+    type: WalletOperationType,
+    options: OperationOptions
+  ) {
+    return this.mutateInTransaction(trx, userId, amount, 'debit', type, options)
+  }
+
   async refund(userId: number, amount: string, options: OperationOptions) {
     return this.mutate(userId, amount, 'credit', 'refund', options)
   }
 
-  async adjust(userId: number, amount: string, direction: Direction, options: OperationOptions) {
+  async adjust(
+    userId: number,
+    amount: string,
+    direction: WalletDirection,
+    options: OperationOptions
+  ) {
     return this.mutate(userId, amount, direction, 'adjustment', options)
   }
 
@@ -76,7 +116,7 @@ export default class WalletService {
       const original = await trx.from('wallet_transactions').where('id', transactionId).first()
       if (!original) throw new WalletNotFoundError()
 
-      const direction: Direction = ['deposit', 'win', 'refund'].includes(original.type)
+      const direction: WalletDirection = ['deposit', 'win', 'refund'].includes(original.type)
         ? 'debit'
         : 'credit'
       return this.mutateInTransaction(
@@ -97,7 +137,7 @@ export default class WalletService {
   private async mutate(
     userId: number,
     amount: string,
-    direction: Direction,
+    direction: WalletDirection,
     type: WalletOperationType,
     options: OperationOptions
   ) {
@@ -110,11 +150,11 @@ export default class WalletService {
     trx: TransactionClientContract,
     userId: number,
     amount: string,
-    direction: Direction,
+    direction: WalletDirection,
     type: WalletOperationType,
     options: OperationOptions
   ) {
-    const amountCents = this.parseMoney(amount)
+    const amountCents = parseMoney(amount)
     if (amountCents <= 0n) throw new WalletError('El monto debe ser mayor que cero.')
 
     await this.ensureWalletInTransaction(trx, userId, false)
@@ -130,7 +170,7 @@ export default class WalletService {
       return existing
     }
 
-    const before = this.parseMoney(wallet.available_balance)
+    const before = parseMoney(wallet.available_balance)
     const after = direction === 'credit' ? before + amountCents : before - amountCents
     if (after < 0n) throw new InsufficientFundsError()
 
@@ -139,16 +179,16 @@ export default class WalletService {
       .from('wallets')
       .where('id', wallet.id)
       .update({
-        available_balance: this.formatMoney(after),
+        available_balance: formatMoney(after),
         updated_at: now,
       })
     await trx.table('wallet_transactions').insert({
       wallet_id: wallet.id,
       user_id: userId,
       type,
-      amount: this.formatMoney(amountCents),
-      balance_before: this.formatMoney(before),
-      balance_after: this.formatMoney(after),
+      amount: formatMoney(amountCents),
+      balance_before: formatMoney(before),
+      balance_after: formatMoney(after),
       status: 'posted',
       idempotency_key: options.idempotencyKey,
       reference: options.reference || null,
@@ -167,8 +207,8 @@ export default class WalletService {
       action: `wallet.${type}`,
       entityType: 'wallet',
       entityId: wallet.id,
-      oldValues: { availableBalance: this.formatMoney(before) },
-      newValues: { availableBalance: this.formatMoney(after), transactionId: transaction.id },
+      oldValues: { availableBalance: formatMoney(before) },
+      newValues: { availableBalance: formatMoney(after), transactionId: transaction.id },
       ipAddress: options.ipAddress,
       userAgent: options.userAgent,
     })
@@ -195,20 +235,5 @@ export default class WalletService {
     const query = trx.from('wallets').where('user_id', userId)
     if (lock) query.forUpdate()
     return query.first()
-  }
-
-  private parseMoney(value: string | number) {
-    const normalized = String(value)
-    if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
-      throw new WalletError('El monto monetario no es válido.')
-    }
-    const [whole, fraction = ''] = normalized.split('.')
-    return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'))
-  }
-
-  private formatMoney(cents: bigint) {
-    const sign = cents < 0n ? '-' : ''
-    const absolute = cents < 0n ? -cents : cents
-    return `${sign}${absolute / 100n}.${(absolute % 100n).toString().padStart(2, '0')}`
   }
 }

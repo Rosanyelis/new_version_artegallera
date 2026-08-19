@@ -76,6 +76,21 @@ router
 
 router.get('/api/v1/events', [() => import('#controllers/event_controller'), 'index'])
 router.get('/api/v1/events/:slug', [() => import('#controllers/event_controller'), 'show'])
+router.get('/api/v1/events/:eventId/rounds/:roundId/result', [
+  () => import('#controllers/bet_controller'),
+  'result',
+])
+
+router
+  .post('/api/v1/events/:eventId/rounds/:roundId/bets', [
+    () => import('#controllers/bet_controller'),
+    'place',
+  ])
+  .use([middleware.apiAuth(), apiThrottle])
+
+router
+  .get('/api/v1/bets', [() => import('#controllers/bet_controller'), 'mine'])
+  .use([middleware.apiAuth(), apiThrottle])
 
 router
   .group(() => {
@@ -91,6 +106,17 @@ router
   .use([
     middleware.apiAuth(),
     middleware.permission({ permissions: ['events.manage'] }),
+    apiThrottle,
+  ])
+
+router
+  .post('/api/v1/admin/rounds/:roundId/settle', [
+    () => import('#controllers/bet_controller'),
+    'settle',
+  ])
+  .use([
+    middleware.apiAuth(),
+    middleware.permission({ permissions: ['rounds.operate'] }),
     apiThrottle,
   ])
 

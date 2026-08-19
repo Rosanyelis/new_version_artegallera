@@ -1,11 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import EventService from '#services/event_service'
 import RoundService from '#services/round_service'
+import SettlementService from '#services/settlement_service'
 import { eventCreateValidator, roundCreateValidator, roundResultValidator } from '#validators/event'
 
 export default class AdminController {
   private events = new EventService()
   private rounds = new RoundService()
+  private settlement = new SettlementService()
 
   async dashboard({ view }: HttpContext) {
     const events = await this.events.listAdmin()
@@ -37,6 +39,11 @@ export default class AdminController {
   }
 
   async transitionRound({ auth, params, request, response }: HttpContext) {
+    if (params.action === 'settled') {
+      await this.settlement.settle(Number(params.id), auth.user!.id)
+      return response.redirect(`/admin/events/${params.slug}`)
+    }
+
     let winningSideId: number | undefined
     if (params.action === 'settling') {
       const payload = await request.validateUsing(roundResultValidator)

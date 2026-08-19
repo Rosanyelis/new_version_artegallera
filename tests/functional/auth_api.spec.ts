@@ -6,6 +6,9 @@ import { InsufficientFundsError } from '#exceptions/wallet'
 import EventService from '#services/event_service'
 import RoundService from '#services/round_service'
 import InvalidStateTransitionError from '#exceptions/state_transition'
+import BettingService from '#services/betting_service'
+import SettlementService from '#services/settlement_service'
+import { BettingClosedError } from '#exceptions/betting'
 import { createHash, randomBytes } from 'node:crypto'
 import { DateTime } from 'luxon'
 
@@ -217,5 +220,93 @@ test.group('Authentication API', () => {
 
     assert.equal(settled.status, 'settled')
     assert.equal(settled.winning_side_id, sides[0].id)
+  })
+
+  test('places a bet atomically and settles the pool idempotently', async ({ assert }) => {
+    const firstUser = await User.create({
+      fullName: 'Red Bettor',
+      email: `red-bettor-${Date.now()}@example.com`,
+      password: 'BetPassword123!',
+      status: 'active',
+      isBettingEnabled: true,
+    })
+    const secondUser = await User.create({
+      fullName: 'Green Bettor',
+      email: `green-bettor-${Date.now()}@example.com`,
+      password: 'BetPassword123!',
+      status: 'active',
+      isBettingEnabled: true,
+    })
+    const wallet = new WalletService()
+    await wallet.ensureWallet(firstUser.id)
+    await wallet.ensureWallet(secondUser.id)
+    await wallet.credit(firstUser.id, '100.00', {
+      idempotencyKey: `deposit-${firstUser.id}-${Date.now()}`,
+    })
+    await wallet.credit(secondUser.id, '100.00', {
+      idempotencyKey: `deposit-${secondUser.id}-${Date.now()}`,
+    })
+
+    const events = new EventService()
+    const rounds = new RoundService()
+    const event = await events.create({ name: `Betting Event ${Date.now()}` }, firstUser.id)
+    await events.transition(event.id, 'scheduled', firstUser.id)
+    await events.transition(event.id, 'live', firstUser.id)
+    const round = await rounds.create(event.id, 1, firstUser.id)
+    const sides = await db.from('betting_sides').where('round_id', round.id).orderBy('id', 'asc')
+    await rounds.transition(round.id, 'betting_open', firstUser.id)
+
+    const betting = new BettingService()
+    const redBet = await betting.placeBet(firstUser.id, event.id, round.id, sides[0].id, '10.00', {
+      idempotencyKey: `bet-red-${round.id}`,
+    })
+    const replay = await betting.placeBet(firstUser.id, event.id, round.id, sides[0].id, '10.00', {
+      idempotencyKey: redBet.idempotency_key,
+    })
+    await betting.placeBet(secondUser.id, event.id, round.id, sides[1].id, '30.00', {
+      idempotencyKey: `bet-green-${round.id}`,
+    })
+
+    assert.equal(replay.id, redBet.id)
+    const balanceAfterBets = await wallet.getBalance(firstUser.id)
+    assert.equal(balanceAfterBets.availableBalance, '90.00')
+    await rounds.transition(round.id, 'betting_closed', firstUser.id)
+    await rounds.transition(round.id, 'in_progress', firstUser.id)
+    await rounds.transition(round.id, 'settling', firstUser.id, sides[0].id)
+
+    const settlement = new SettlementService()
+    const result = await settlement.settle(round.id, firstUser.id)
+    const repeatedResult = await settlement.settle(round.id, firstUser.id)
+
+    assert.equal(result.id, repeatedResult.id)
+    assert.equal(result.total_pool, '40.00')
+    assert.equal(result.total_payout, '40.00')
+    const firstBalance = await wallet.getBalance(firstUser.id)
+    const secondBalance = await wallet.getBalance(secondUser.id)
+    assert.equal(firstBalance.availableBalance, '130.00')
+    assert.equal(secondBalance.availableBalance, '70.00')
+  })
+
+  test('rejects bets when betting is not open', async ({ assert }) => {
+    const user = await User.create({
+      fullName: 'Closed Bettor',
+      email: `closed-bettor-${Date.now()}@example.com`,
+      password: 'BetPassword123!',
+      status: 'active',
+      isBettingEnabled: true,
+    })
+    const events = new EventService()
+    const rounds = new RoundService()
+    const event = await events.create({ name: `Closed Event ${Date.now()}` }, user.id)
+    const round = await rounds.create(event.id, 1, user.id)
+    const side = await db.from('betting_sides').where('round_id', round.id).first()
+
+    await assert.rejects(
+      () =>
+        new BettingService().placeBet(user.id, event.id, round.id, side.id, '5.00', {
+          idempotencyKey: `closed-${round.id}`,
+        }),
+      BettingClosedError
+    )
   })
 })

@@ -7,6 +7,7 @@ export const controllers = {
   AdminAccess: () => import('#controllers/admin_access_controller'),
   Admin: () => import('#controllers/admin_controller'),
   ApiAuth: () => import('#controllers/api_auth_controller'),
+  Bet: () => import('#controllers/bet_controller'),
   Event: () => import('#controllers/event_controller'),
   Health: () => import('#controllers/health_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
