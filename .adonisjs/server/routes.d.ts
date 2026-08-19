@@ -6,6 +6,7 @@ export type ScannedRoutes = {
   ALL: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'metrics': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
@@ -45,6 +46,7 @@ export type ScannedRoutes = {
   GET: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'metrics': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'client.events': { paramsTuple?: []; params?: {} }
@@ -70,6 +72,7 @@ export type ScannedRoutes = {
   HEAD: {
     'health': { paramsTuple?: []; params?: {} }
     'ready': { paramsTuple?: []; params?: {} }
+    'metrics': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'client.events': { paramsTuple?: []; params?: {} }

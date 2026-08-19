@@ -15,19 +15,31 @@ const shieldConfig = defineConfig({
      * Enable Content Security Policy headers.
      * CSP helps prevent XSS attacks by controlling which resources can be loaded.
      */
-    enabled: false,
+    enabled: true,
 
     /**
      * CSP directives define the allowed sources for different resource types.
      * Example: { defaultSrc: ["'self'"], scriptSrc: ["'self'", "'unsafe-inline'"] }
      */
-    directives: {},
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      mediaSrc: ["'self'", 'blob:', 'http://localhost:8888'],
+      connectSrc: ["'self'", 'ws:', 'wss:', 'https:', 'http://localhost:8888'],
+      fontSrc: ["'self'", 'data:'],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+    },
 
     /**
      * When true, CSP violations are reported but not enforced.
      * Useful for testing CSP policies before enforcing them.
      */
-    reportOnly: false,
+    reportOnly: true,
   },
 
   /**

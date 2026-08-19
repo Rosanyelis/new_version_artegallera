@@ -16,7 +16,11 @@
     "test:client": "vitest run --config vitest.config.ts --pool=forks --no-file-parallelism",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "backup": "scripts/backup.sh",
+    "backup:verify": "scripts/backup.sh --verify",
+    "monitor": "node scripts/monitor.mjs",
+    "load:test": "node scripts/load_test.mjs"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

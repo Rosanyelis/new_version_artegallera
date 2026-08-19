@@ -13,6 +13,10 @@ tmp/*
 # Frontend assets compiled code
 public/assets
 
+# Database backups
+backups/*
+!backups/.gitkeep
+
 # Build tools specific
 npm-debug.log
 yarn-error.log

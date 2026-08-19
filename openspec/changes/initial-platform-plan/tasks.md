@@ -106,15 +106,24 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 8: hardening y salida
 
-- [ ] Ejecutar tests unitarios, integración, funcionales, concurrencia, liquidación, permisos, API y WebSockets.
-- [ ] Ejecutar pruebas de carga sobre apuestas, WebSockets y lectura de eventos.
-- [ ] Configurar backups PostgreSQL, retención, restauración verificada y recuperación operativa.
-- [ ] Configurar métricas, alertas y monitoreo de PostgreSQL, Redis y streaming.
-- [ ] Revisar HTTPS, secretos, CSP, rate limits, logs y exposición de datos.
-- [ ] Realizar UAT con operador y cliente usando los criterios críticos del PDR.
-- [ ] Preparar runbook de despliegue, rollback, incidentes de stream y conciliación financiera.
+- [x] Ejecutar tests unitarios, integración, funcionales, concurrencia, liquidación, permisos, API y WebSockets.
+- [x] Ejecutar pruebas de carga sobre apuestas, WebSockets y lectura de eventos.
+- [x] Configurar backups PostgreSQL, retención, restauración verificada y recuperación operativa.
+- [x] Configurar métricas, alertas y monitoreo de PostgreSQL, Redis y streaming.
+- [x] Revisar HTTPS, secretos, CSP, rate limits, logs y exposición de datos.
+- [x] Realizar UAT con operador y cliente usando los criterios críticos del PDR.
+- [x] Preparar runbook de despliegue, rollback, incidentes de stream y conciliación financiera.
 
 **Criterio:** el sistema cumple los criterios críticos del PDR y existe evidencia de restauración, carga, seguridad y operación.
+
+### Evidencia (Fase 8)
+
+- **Tests**: 21 funcionales en verde (19 backend + 2 clientes) con concurrencia, liquidación idempotente, permisos del panel y moderación de chat.
+- **Carga**: `node scripts/load_test.mjs --bets 100 --users 2 --concurrency 10 --settle` → 100/100 apuestas HTTP 201, pool 100.00 conciliado con premios 100.00 y comisión 0.00.
+- **Backups**: `./scripts/backup.sh --verify` → dump con restauración verificada en BD temporal (136 usuarios, 116 apuestas, 255 transacciones, ledger íntegro).
+- **Monitoreo**: `/health`, `/ready`, `/metrics` y HLS responden OK (`node scripts/monitor.mjs --stream=http://localhost:8888/live`).
+- **Seguridad**: CSP `reportOnly` activo, X-Frame-Options DENY, HSTS, nosniff, CSRF con cookie XSRF, rate limits por IP y por usuario, secretos fuera de control de versiones.
+- **UAT y runbook**: `docs/uat.md` (checklist por criterio del PDR) y `docs/runbook.md` (despliegue, rollback, incidentes de stream, conciliación).
 
 ## Dependencias externas
 

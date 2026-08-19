@@ -53,6 +53,14 @@ El tiempo real usa AdonisJS Transmit sobre Redis Pub/Sub. El cliente se suscribe
 npm run dev:client
 ```
 
+### Seguridad y operación
+
+Los endpoints `/health`, `/ready` y `/metrics` permiten supervisar la API, PostgreSQL, Redis, memoria y conteos agregados. `npm run monitor` los valida en conjunto (salida 0/1 para cron) y admite `--stream=<hls-url>` para comprobar MediaMTX.
+
+Los backups se gestionan con `npm run backup` (dump comprimido en `backups/` con retención configurable) y `npm run backup:verify` (restaura en una BD temporal y valida conteos e integridad del ledger). `npm run load:test` ejecuta la prueba de carga contra una instancia en marcha.
+
+El CSP está habilitado en modo `reportOnly` (verifica y reporta sin bloquear); Shield además envía `X-Frame-Options: DENY`, HSTS y `X-Content-Type-Options: nosniff`. El registro/login tienen rate limit por IP y las rutas API por usuario. Documentos de aceptación y operación: `docs/uat.md` (checklist UAT por criterio del PDR) y `docs/runbook.md` (despliegue, rollback, incidentes de stream y conciliación financiera).
+
 ## Build
 
 ```sh

@@ -15,6 +15,7 @@ import transmit from '@adonisjs/transmit/services/main'
 
 router.get('/health', [() => import('#controllers/health_controller'), 'health']).as('health')
 router.get('/ready', [() => import('#controllers/health_controller'), 'ready']).as('ready')
+router.get('/metrics', [() => import('#controllers/health_controller'), 'metrics']).as('metrics')
 
 transmit.authorize<{ eventId: string }>('events/:eventId', async (ctx, { eventId }) => {
   return Boolean(ctx.auth.user && Number(eventId) > 0)
