@@ -155,11 +155,6 @@ router
     middleware.permission({ permissions: ['events.manage'] }),
     apiThrottle,
   ])
-  .use([
-    middleware.apiAuth(),
-    middleware.permission({ permissions: ['rounds.operate'] }),
-    apiThrottle,
-  ])
 
 router
   .get('/api/v1/admin/access-check', [
@@ -201,6 +196,97 @@ router
         'transitionRound',
       ])
       .as('admin.rounds.transition')
+
+    router
+      .get('/users', [() => import('#controllers/admin_user_controller'), 'index'])
+      .as('admin.users.index')
+      .use(middleware.panelPermission({ permissions: ['users.read'] }))
+    router
+      .get('/users/:id', [() => import('#controllers/admin_user_controller'), 'show'])
+      .as('admin.users.show')
+      .use(middleware.panelPermission({ permissions: ['users.read'] }))
+    router
+      .post('/users/:id/status', [
+        () => import('#controllers/admin_user_controller'),
+        'changeStatus',
+      ])
+      .as('admin.users.status')
+      .use(middleware.panelPermission({ permissions: ['users.manage'] }))
+    router
+      .post('/users/:id/betting', [
+        () => import('#controllers/admin_user_controller'),
+        'toggleBetting',
+      ])
+      .as('admin.users.betting')
+      .use(middleware.panelPermission({ permissions: ['users.manage'] }))
+    router
+      .post('/users/:id/role', [() => import('#controllers/admin_user_controller'), 'assignRole'])
+      .as('admin.users.role')
+      .use(middleware.panelPermission({ permissions: ['users.manage'] }))
+
+    router
+      .post('/wallets/adjust', [() => import('#controllers/admin_user_controller'), 'adjustWallet'])
+      .as('admin.wallets.adjust')
+      .use(middleware.panelPermission({ permissions: ['wallets.manage'] }))
+
+    router
+      .get('/moderation', [() => import('#controllers/admin_moderation_controller'), 'index'])
+      .as('admin.moderation.index')
+      .use(middleware.panelPermission({ permissions: ['chat.moderate'] }))
+    router
+      .post('/moderation/:id/state', [
+        () => import('#controllers/admin_moderation_controller'),
+        'moderate',
+      ])
+      .as('admin.moderation.state')
+      .use(middleware.panelPermission({ permissions: ['chat.moderate'] }))
+
+    router
+      .get('/reports/events', [() => import('#controllers/admin_report_controller'), 'events'])
+      .as('admin.reports.events')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/events.csv', [
+        () => import('#controllers/admin_report_controller'),
+        'eventsCsv',
+      ])
+      .as('admin.reports.events.csv')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/bets', [() => import('#controllers/admin_report_controller'), 'bets'])
+      .as('admin.reports.bets')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/bets.csv', [() => import('#controllers/admin_report_controller'), 'betsCsv'])
+      .as('admin.reports.bets.csv')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/financial', [
+        () => import('#controllers/admin_report_controller'),
+        'financial',
+      ])
+      .as('admin.reports.financial')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/financial.csv', [
+        () => import('#controllers/admin_report_controller'),
+        'financialCsv',
+      ])
+      .as('admin.reports.financial.csv')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/users', [() => import('#controllers/admin_report_controller'), 'users'])
+      .as('admin.reports.users')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+    router
+      .get('/reports/users.csv', [() => import('#controllers/admin_report_controller'), 'usersCsv'])
+      .as('admin.reports.users.csv')
+      .use(middleware.panelPermission({ permissions: ['reports.read'] }))
+
+    router
+      .get('/audit', [() => import('#controllers/admin_audit_controller'), 'index'])
+      .as('admin.audit.index')
+      .use(middleware.panelPermission({ permissions: ['audit.read'] }))
   })
   .prefix('/admin')
   .use([middleware.auth(), middleware.adminPermission()])

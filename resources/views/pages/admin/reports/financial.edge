@@ -1,0 +1,119 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    @include('partials/report_tabs')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Reportes</p>
+        <h1>Financiero</h1>
+        <p class="admin-muted">Movimientos del ledger y pools liquidados por rango de fechas.</p>
+      </div>
+      <a class="admin-link" href="/admin/reports/financial.csv?{{ qs }}">Descargar CSV</a>
+    </div>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/reports/financial">
+        <label>
+          Desde
+          <input name="from" type="date" value="{{ filters.from ?? '' }}" />
+        </label>
+        <label>
+          Hasta
+          <input name="to" type="date" value="{{ filters.to ?? '' }}" />
+        </label>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-metrics-grid">
+      <div class="admin-metric">
+        <span>Movimientos</span>
+        <strong>{{ report.totals.total }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Acreditado</span>
+        <strong>{{ report.totals.credited }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Debitado</span>
+        <strong>{{ report.totals.debited }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Bruto</span>
+        <strong>{{ report.totals.gross }}</strong>
+      </div>
+    </section>
+
+    <section class="admin-grid">
+      <div class="admin-card admin-table-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Ledger</p>
+            <h2>Movimientos por tipo</h2>
+          </div>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Operaciones</th>
+              <th>Acreditado</th>
+              <th>Debitado</th>
+              <th>Bruto</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(row in report.byType)
+              <tr>
+                <td>{{ row.type }}</td>
+                <td>{{ row.tx_count }}</td>
+                <td>{{ row.credited }}</td>
+                <td>{{ row.debited }}</td>
+                <td>{{ row.gross }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      </div>
+
+      <div class="admin-card admin-table-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Liquidación</p>
+            <h2>Rondas liquidadas</h2>
+          </div>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Rondas</td>
+              <td>{{ report.results.rounds }}</td>
+            </tr>
+            <tr>
+              <td>Pool total</td>
+              <td>{{ report.results.pool }}</td>
+            </tr>
+            <tr>
+              <td>Premios pagados</td>
+              <td>{{ report.results.payout }}</td>
+            </tr>
+            <tr>
+              <td>Ganadores</td>
+              <td>{{ report.results.winners }}</td>
+            </tr>
+            <tr>
+              <td>Comisión de la casa</td>
+              <td>{{ report.results.commission }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+@end

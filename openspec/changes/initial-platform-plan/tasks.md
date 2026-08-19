@@ -94,13 +94,15 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 7: administración complementaria y reportes
 
-- [ ] Implementar gestión de usuarios, roles, suspensión y ajustes con doble confirmación.
-- [ ] Implementar promociones, notificaciones y moderación de chat en Edge.
-- [ ] Implementar reportes de eventos, apuestas, financiero y usuarios con filtros y exportación.
-- [ ] Implementar consulta de auditoría con acceso restringido e historial inmutable.
-- [ ] Completar dashboard con métricas operativas y estado del streaming.
+- [x] Implementar gestión de usuarios en Edge: listado con filtros (búsqueda, estado, rol, apuestas), detalle con wallet, movimientos, apuestas y roles.
+- [x] Implementar suspensión/bloqueo/activación con doble confirmación (escribir el correo del usuario + checkbox) y toggle de apuestas, ambos auditados.
+- [x] Implementar ajuste de saldo de wallet en Edge con doble confirmación e idempotencia, reutilizando `WalletService`.
+- [x] Implementar moderación de chat en Edge: ocultar, restaurar y eliminar mensajes con auditoría por acción.
+- [x] Implementar reportes con filtros y exportación CSV: eventos, apuestas, financiero (ledger + liquidaciones) y usuarios.
+- [x] Implementar consulta de auditoría inmutable con filtros (acción, entidad, operador, rango de fechas) y acceso restringido.
+- [x] Completar dashboard con métricas operativas (usuarios, volumen, streams activos, apuestas recientes y actividad de auditoría).
 
-**Criterio:** un administrador puede investigar una operación desde el evento hasta su movimiento financiero y auditoría.
+**Criterio:** cumplido; un administrador puede investigar una operación desde el evento hasta su movimiento financiero y auditoría, y exportar los reportes.
 
 ## Fase 8: hardening y salida
 

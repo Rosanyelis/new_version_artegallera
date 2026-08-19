@@ -19,6 +19,8 @@ export default class extends BaseSeeder {
       ['rounds.operate', 'Operar rondas'],
       ['wallets.manage', 'Gestionar wallets'],
       ['audit.read', 'Consultar auditoría'],
+      ['chat.moderate', 'Moderar el chat'],
+      ['reports.read', 'Consultar reportes'],
     ]
 
     for (const [code, name] of roles) {

@@ -1,0 +1,71 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    @include('partials/report_tabs')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Reportes</p>
+        <h1>Usuarios</h1>
+        <p class="admin-muted">Actividad y saldo por usuario. Máximo 500 filas.</p>
+      </div>
+      <a class="admin-link" href="/admin/reports/users.csv?{{ qs }}">Descargar CSV</a>
+    </div>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/reports/users">
+        <input name="search" placeholder="Buscar usuario" value="{{ filters.search ?? '' }}" />
+        <select name="status">
+          <option value="">Todos los estados</option>
+          @each(status in ['active', 'suspended', 'blocked', 'inactive'])
+            <option value="{{ status }}" @if(filters.status === status) selected @end>{{ status }}</option>
+          @end
+        </select>
+        <label>
+          Desde
+          <input name="from" type="date" value="{{ filters.from ?? '' }}" />
+        </label>
+        <label>
+          Hasta
+          <input name="to" type="date" value="{{ filters.to ?? '' }}" />
+        </label>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      @if(rows.length === 0)
+        <p class="admin-muted">No hay usuarios que coincidan.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Roles</th>
+              <th>Apuestas</th>
+              <th>Apostado</th>
+              <th>Ganancias</th>
+              <th>Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(user in rows)
+              <tr>
+                <td>
+                  <strong>{{ user.full_name || user.email }}</strong>
+                  <span class="admin-table-sub">{{ user.email }}</span>
+                </td>
+                <td><span class="admin-status admin-status-{{ user.status }}">{{ user.status }}</span></td>
+                <td>{{ user.roles || '—' }}</td>
+                <td>{{ user.bets_count }}</td>
+                <td>{{ user.wagered }}</td>
+                <td>{{ user.winnings }}</td>
+                <td>{{ user.available_balance ?? '0.00' }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+  </div>
+@end

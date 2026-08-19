@@ -28,7 +28,14 @@ La recuperación de contraseña usa Resend y expone `POST /api/v1/auth/forgot-pa
 
 La wallet expone `GET /api/v1/wallet` y `GET /api/v1/wallet/transactions`. Los ajustes administrativos usan `POST /api/v1/admin/wallets/adjust` con permisos, clave de idempotencia y auditoría.
 
-El panel operativo Edge está disponible en `/admin` para usuarios con el permiso `admin.access`. Desde allí se crean eventos, rondas y se ejecutan sus transiciones operativas.
+El panel operativo Edge está disponible en `/admin` para usuarios con el permiso `admin.access`. Desde allí se crean eventos, rondas y se ejecutan sus transiciones operativas, además de la administración complementaria:
+
+- `/admin/users` y `/admin/users/:id` — gestión de usuarios con filtros, detalle de wallet/apuestas/roles y suspensión o ajuste de saldo con doble confirmación (escribiendo el correo del usuario).
+- `/admin/moderation` — moderación de chat (ocultar, restaurar, eliminar) con auditoría.
+- `/admin/reports/events`, `/admin/reports/bets`, `/admin/reports/financial` y `/admin/reports/users` — reportes con filtros por rango de fechas y exportación CSV.
+- `/admin/audit` — consulta de solo lectura del registro de auditoría inmutable.
+
+Los permisos por sección son `users.read`/`users.manage`, `chat.moderate`, `reports.read`, `audit.read` y `wallets.manage`. El seeder `admin_seeder` crea el administrador inicial desde `ADMIN_EMAIL`/`ADMIN_PASSWORD` (solo desarrollo).
 
 Las apuestas usan pool por lado y exponen `POST /api/v1/events/:eventId/rounds/:roundId/bets`, `GET /api/v1/bets`, `GET /api/v1/events/:eventId/rounds/:roundId/result` y `POST /api/v1/admin/rounds/:roundId/settle`.
 

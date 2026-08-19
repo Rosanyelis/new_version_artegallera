@@ -1,0 +1,69 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Auditoría</p>
+        <h1>Historial inmutable</h1>
+        <p class="admin-muted">Consultas de solo lectura sobre el registro de auditoría.</p>
+      </div>
+      <span class="admin-badge">{{ entries.length }} registros</span>
+    </div>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/audit">
+        <input name="search" placeholder="Buscar operador" value="{{ filters.search ?? '' }}" />
+        <input name="action" placeholder="Acción (ej: wallet.deposit)" value="{{ filters.action ?? '' }}" />
+        <input name="entityType" placeholder="Entidad (user, wallet, bet...)" value="{{ filters.entityType ?? '' }}" />
+        <input name="entityId" placeholder="Id de entidad" value="{{ filters.entityId ?? '' }}" />
+        <label>
+          Desde
+          <input name="from" type="date" value="{{ filters.from ?? '' }}" />
+        </label>
+        <label>
+          Hasta
+          <input name="to" type="date" value="{{ filters.to ?? '' }}" />
+        </label>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      @if(entries.length === 0)
+        <p class="admin-muted">No hay registros que coincidan.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Acción</th>
+              <th>Entidad</th>
+              <th>Operador</th>
+              <th>Cambios</th>
+              <th>IP</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(entry in entries)
+              <tr>
+                <td>{{ entry.id }}</td>
+                <td>{{ entry.action }}</td>
+                <td>{{ entry.entity_type }}#{{ entry.entity_id }}</td>
+                <td>{{ entry.actor_email || 'sistema' }}</td>
+                <td class="admin-table-json">
+                  <details>
+                    <summary>ver</summary>
+                    <pre>{{ JSON.stringify(entry.old_values) }} → {{ JSON.stringify(entry.new_values) }}</pre>
+                  </details>
+                </td>
+                <td>{{ entry.ip_address || '—' }}</td>
+                <td>{{ entry.created_at }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+  </div>
+@end

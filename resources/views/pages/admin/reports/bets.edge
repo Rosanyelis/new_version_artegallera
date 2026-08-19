@@ -1,0 +1,90 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    @include('partials/report_tabs')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Reportes</p>
+        <h1>Apuestas</h1>
+        <p class="admin-muted">Detalle de apuestas con totales. Máximo 500 filas.</p>
+      </div>
+      <a class="admin-link" href="/admin/reports/bets.csv?{{ qs }}">Descargar CSV</a>
+    </div>
+
+    <section class="admin-card admin-metrics-grid">
+      <div class="admin-metric">
+        <span>Apuestas</span>
+        <strong>{{ totals.total }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Volumen</span>
+        <strong>{{ totals.volume }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Premios</span>
+        <strong>{{ totals.payouts }}</strong>
+      </div>
+    </section>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/reports/bets">
+        <input name="search" placeholder="Buscar usuario" value="{{ filters.search ?? '' }}" />
+        <select name="status">
+          <option value="">Todos los estados</option>
+          @each(status in ['pending', 'accepted', 'cancelled', 'won', 'lost', 'refunded', 'rejected'])
+            <option value="{{ status }}" @if(filters.status === status) selected @end>{{ status }}</option>
+          @end
+        </select>
+        <label>
+          Desde
+          <input name="from" type="date" value="{{ filters.from ?? '' }}" />
+        </label>
+        <label>
+          Hasta
+          <input name="to" type="date" value="{{ filters.to ?? '' }}" />
+        </label>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      @if(rows.length === 0)
+        <p class="admin-muted">No hay apuestas que coincidan.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Evento</th>
+              <th>Ronda</th>
+              <th>Lado</th>
+              <th>Usuario</th>
+              <th>Monto</th>
+              <th>Premio</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(bet in rows)
+              <tr>
+                <td>{{ bet.id }}</td>
+                <td>{{ bet.event_name }}</td>
+                <td>{{ bet.round_number }}</td>
+                <td>{{ bet.side_name }}</td>
+                <td>
+                  <strong>{{ bet.full_name || bet.email }}</strong>
+                  <span class="admin-table-sub">{{ bet.email }}</span>
+                </td>
+                <td>{{ bet.amount }}</td>
+                <td>{{ bet.payout_amount }}</td>
+                <td><span class="admin-status admin-status-{{ bet.status }}">{{ bet.status }}</span></td>
+                <td>{{ bet.placed_at }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+  </div>
+@end

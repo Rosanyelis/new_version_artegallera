@@ -1,0 +1,96 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Administración</p>
+        <h1>Usuarios</h1>
+        <p class="admin-muted">{{ total }} usuarios.</p>
+      </div>
+      <span class="admin-badge">Página {{ page }}</span>
+    </div>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/users">
+        <input name="search" placeholder="Buscar email o nombre" value="{{ filters.search ?? '' }}" />
+        <select name="status">
+          <option value="">Todos los estados</option>
+          @each(status in ['active', 'suspended', 'blocked', 'inactive'])
+            <option value="{{ status }}" @if(filters.status === status) selected @end>
+              {{ status }}
+            </option>
+          @end
+        </select>
+        <select name="roleCode">
+          <option value="">Todos los roles</option>
+          @each(role in roles)
+            <option value="{{ role.code }}" @if(filters.roleCode === role.code) selected @end>
+              {{ role.name }}
+            </option>
+          @end
+        </select>
+        <select name="betting">
+          <option value="">Apuestas: todas</option>
+          <option value="1" @if(filters.betting === '1') selected @end>Habilitadas</option>
+          <option value="0" @if(filters.betting === '0') selected @end>Deshabilitadas</option>
+        </select>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      @if(users.length === 0)
+        <p class="admin-muted">No hay usuarios que coincidan.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Roles</th>
+              <th>Apuestas</th>
+              <th>Registro</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(user in users)
+              <tr>
+                <td>
+                  <strong>{{ user.full_name || user.email }}</strong>
+                  <span class="admin-table-sub">{{ user.email }}</span>
+                </td>
+                <td>
+                  <span class="admin-status admin-status-{{ user.status }}">{{ user.status }}</span>
+                </td>
+                <td>{{ user.roles || '—' }}</td>
+                <td>
+                  @if(user.is_betting_enabled)
+                    <span class="admin-badge">sí</span>
+                  @else
+                    no
+                  @end
+                </td>
+                <td>{{ user.created_at }}</td>
+                <td>
+                  <a class="admin-link" href="/admin/users/{{ user.id }}">Ver detalle</a>
+                </td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+        @if(total > perPage)
+          <nav class="admin-pagination">
+            @if(page > 1)
+              <a href="?page={{ page - 1 }}">← Anterior</a>
+            @end
+            <span>Página {{ page }}</span>
+            @if(page * perPage < total)
+              <a href="?page={{ page + 1 }}">Siguiente →</a>
+            @end
+          </nav>
+        @end
+      @end
+    </section>
+  </div>
+@end

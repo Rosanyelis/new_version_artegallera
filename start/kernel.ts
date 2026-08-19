@@ -51,4 +51,5 @@ export const middleware = router.named({
   apiAuth: () => import('#middleware/api_auth_middleware'),
   permission: () => import('#middleware/permission_middleware'),
   adminPermission: () => import('#middleware/admin_permission_middleware'),
+  panelPermission: () => import('#middleware/panel_permission_middleware'),
 })

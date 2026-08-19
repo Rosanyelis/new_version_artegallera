@@ -24,6 +24,23 @@ export type ScannedRoutes = {
     'admin.rounds.store': { paramsTuple: [ParamValue,ParamValue]; params: {'eventId': ParamValue,'slug': ParamValue} }
     'admin.events.transition': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'action': ParamValue} }
     'admin.rounds.transition': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'slug': ParamValue,'id': ParamValue,'action': ParamValue} }
+    'admin.users.index': { paramsTuple?: []; params?: {} }
+    'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.betting': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.role': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.wallets.adjust': { paramsTuple?: []; params?: {} }
+    'admin.moderation.index': { paramsTuple?: []; params?: {} }
+    'admin.moderation.state': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.reports.events': { paramsTuple?: []; params?: {} }
+    'admin.reports.events.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.users': { paramsTuple?: []; params?: {} }
+    'admin.reports.users.csv': { paramsTuple?: []; params?: {} }
+    'admin.audit.index': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'health': { paramsTuple?: []; params?: {} }
@@ -37,6 +54,18 @@ export type ScannedRoutes = {
     'new_account.create': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'admin.users.index': { paramsTuple?: []; params?: {} }
+    'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.moderation.index': { paramsTuple?: []; params?: {} }
+    'admin.reports.events': { paramsTuple?: []; params?: {} }
+    'admin.reports.events.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.users': { paramsTuple?: []; params?: {} }
+    'admin.reports.users.csv': { paramsTuple?: []; params?: {} }
+    'admin.audit.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'health': { paramsTuple?: []; params?: {} }
@@ -50,6 +79,18 @@ export type ScannedRoutes = {
     'new_account.create': { paramsTuple?: []; params?: {} }
     'admin.dashboard': { paramsTuple?: []; params?: {} }
     'admin.event': { paramsTuple: [ParamValue]; params: {'slug': ParamValue} }
+    'admin.users.index': { paramsTuple?: []; params?: {} }
+    'admin.users.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.moderation.index': { paramsTuple?: []; params?: {} }
+    'admin.reports.events': { paramsTuple?: []; params?: {} }
+    'admin.reports.events.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets': { paramsTuple?: []; params?: {} }
+    'admin.reports.bets.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial': { paramsTuple?: []; params?: {} }
+    'admin.reports.financial.csv': { paramsTuple?: []; params?: {} }
+    'admin.reports.users': { paramsTuple?: []; params?: {} }
+    'admin.reports.users.csv': { paramsTuple?: []; params?: {} }
+    'admin.audit.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -61,6 +102,11 @@ export type ScannedRoutes = {
     'admin.rounds.store': { paramsTuple: [ParamValue,ParamValue]; params: {'eventId': ParamValue,'slug': ParamValue} }
     'admin.events.transition': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'action': ParamValue} }
     'admin.rounds.transition': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'slug': ParamValue,'id': ParamValue,'action': ParamValue} }
+    'admin.users.status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.betting': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.users.role': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.wallets.adjust': { paramsTuple?: []; params?: {} }
+    'admin.moderation.state': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

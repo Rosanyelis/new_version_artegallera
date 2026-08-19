@@ -1,13 +1,154 @@
 @layout()
   <div class="admin-page">
+    @include('partials/admin_nav')
     <div class="admin-heading">
       <div>
         <p class="admin-kicker">Operaciones</p>
         <h1>Panel administrativo</h1>
-        <p class="admin-muted">Gestiona jornadas y controla el ciclo de cada evento.</p>
+        <p class="admin-muted">Gestiona jornadas, usuarios, reportes y controla el ciclo de cada evento.</p>
       </div>
       <span class="admin-badge">{{ events.length }} eventos</span>
     </div>
+
+    <section class="admin-metrics-grid">
+      <div class="admin-metric">
+        <span>Usuarios activos</span>
+        <strong>{{ metrics.usersActive }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Suspendidos</span>
+        <strong>{{ metrics.usersSuspended }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Eventos en vivo</span>
+        <strong>{{ metrics.eventsLive }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Apuestas hoy</span>
+        <strong>{{ metrics.betsToday }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Volumen hoy</span>
+        <strong>{{ metrics.volumeToday }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Volumen total</span>
+        <strong>{{ metrics.volumeTotal }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Comisión liquidada</span>
+        <strong>{{ metrics.commissionTotal }}</strong>
+      </div>
+      <div class="admin-metric">
+        <span>Saldo en wallets</span>
+        <strong>{{ metrics.walletBalance }}</strong>
+      </div>
+    </section>
+
+    <section class="admin-grid">
+      <div class="admin-card admin-table-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Tiempo real</p>
+            <h2>Streams activos</h2>
+          </div>
+        </div>
+        @if(metrics.liveStreams.length === 0)
+          <p class="admin-muted">Ningún stream activo.</p>
+        @else
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Estado</th>
+                <th>Playback</th>
+              </tr>
+            </thead>
+            <tbody>
+              @each(stream in metrics.liveStreams)
+                <tr>
+                  <td>{{ stream.name }}</td>
+                  <td><span class="admin-status admin-status-live">{{ stream.status }}</span></td>
+                  <td>
+                    <a class="admin-link" href="/eventos/{{ stream.slug }}">Ver cliente</a>
+                  </td>
+                </tr>
+              @end
+            </tbody>
+          </table>
+        @end
+      </div>
+
+      <div class="admin-card admin-table-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Recientes</p>
+            <h2>Últimas apuestas</h2>
+          </div>
+          <a class="admin-link" href="/admin/reports/bets">Ver reporte</a>
+        </div>
+        @if(metrics.recentBets.length === 0)
+          <p class="admin-muted">Sin apuestas todavía.</p>
+        @else
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Lado</th>
+                <th>Usuario</th>
+                <th>Monto</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @each(bet in metrics.recentBets)
+                <tr>
+                  <td>{{ bet.event_name }}</td>
+                  <td>{{ bet.side_name }}</td>
+                  <td>{{ bet.full_name || bet.email }}</td>
+                  <td>{{ bet.amount }}</td>
+                  <td><span class="admin-status admin-status-{{ bet.status }}">{{ bet.status }}</span></td>
+                </tr>
+              @end
+            </tbody>
+          </table>
+        @end
+      </div>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      <div class="admin-card-heading">
+        <div>
+          <p class="admin-kicker">Auditoría</p>
+          <h2>Actividad reciente</h2>
+        </div>
+        <a class="admin-link" href="/admin/audit">Ver auditoría</a>
+      </div>
+      @if(metrics.recentAudit.length === 0)
+        <p class="admin-muted">Sin actividad registrada.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Acción</th>
+              <th>Entidad</th>
+              <th>Operador</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(entry in metrics.recentAudit)
+              <tr>
+                <td>{{ entry.action }}</td>
+                <td>{{ entry.entity_type }}#{{ entry.entity_id }}</td>
+                <td>{{ entry.actor_email || 'sistema' }}</td>
+                <td>{{ entry.created_at }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
 
     <section class="admin-grid">
       <div class="admin-card">

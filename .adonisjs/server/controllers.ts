@@ -5,7 +5,11 @@
 
 export const controllers = {
   AdminAccess: () => import('#controllers/admin_access_controller'),
+  AdminAudit: () => import('#controllers/admin_audit_controller'),
   Admin: () => import('#controllers/admin_controller'),
+  AdminModeration: () => import('#controllers/admin_moderation_controller'),
+  AdminReport: () => import('#controllers/admin_report_controller'),
+  AdminUser: () => import('#controllers/admin_user_controller'),
   ApiAuth: () => import('#controllers/api_auth_controller'),
   Bet: () => import('#controllers/bet_controller'),
   Chat: () => import('#controllers/chat_controller'),

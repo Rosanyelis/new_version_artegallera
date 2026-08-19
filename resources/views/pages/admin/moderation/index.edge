@@ -1,0 +1,97 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Moderación</p>
+        <h1>Mensajes del chat</h1>
+        <p class="admin-muted">Oculta, restaura o elimina mensajes. Cada acción queda en auditoría.</p>
+      </div>
+      <span class="admin-badge">{{ messages.length }} mensajes</span>
+    </div>
+
+    <section class="admin-card">
+      <form class="admin-filters" method="get" action="/admin/moderation">
+        <select name="eventId">
+          <option value="">Todos los eventos</option>
+          @each(event in events)
+            <option value="{{ event.id }}" @if(String(filters.eventId) === String(event.id)) selected @end>
+              {{ event.name }}
+            </option>
+          @end
+        </select>
+        <select name="status">
+          <option value="">Todos los estados</option>
+          @each(status in ['visible', 'hidden', 'deleted', 'reported'])
+            <option value="{{ status }}" @if(filters.status === status) selected @end>{{ status }}</option>
+          @end
+        </select>
+        <input name="search" placeholder="Buscar en el contenido" value="{{ filters.search ?? '' }}" />
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      @if(messages.length === 0)
+        <p class="admin-muted">No hay mensajes que coincidan.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Evento</th>
+              <th>Usuario</th>
+              <th>Mensaje</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(message in messages)
+              <tr>
+                <td>{{ message.event_name }}</td>
+                <td>
+                  <strong>{{ message.full_name || message.email }}</strong>
+                  <span class="admin-table-sub">{{ message.email }}</span>
+                </td>
+                <td class="admin-table-msg">{{ message.content || '—' }}</td>
+                <td>
+                  <span class="admin-status admin-status-{{ message.status }}">{{ message.status }}</span>
+                  @if(message.moderator_email)
+                    <span class="admin-table-sub">por {{ message.moderator_email }}</span>
+                  @end
+                </td>
+                <td>{{ message.created_at }}</td>
+                <td class="admin-actions admin-actions-wrap">
+                  @form({
+                    route: 'admin.moderation.state',
+                    routeParams: { id: message.id },
+                    method: 'POST',
+                  })
+                    @if(message.status !== 'visible')
+                      <input type="hidden" name="action" value="show" />
+                      <button class="admin-button admin-button-muted" type="submit">Restaurar</button>
+                    @else
+                      <input type="hidden" name="action" value="hide" />
+                      <button class="admin-button admin-button-muted" type="submit">Ocultar</button>
+                    @end
+                  @end
+                  @if(message.status !== 'deleted')
+                    @form({
+                      route: 'admin.moderation.state',
+                      routeParams: { id: message.id },
+                      method: 'POST',
+                    })
+                      <input type="hidden" name="action" value="delete" />
+                      <button class="admin-button admin-button-danger" type="submit">Eliminar</button>
+                    @end
+                  @end
+                </td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+  </div>
+@end

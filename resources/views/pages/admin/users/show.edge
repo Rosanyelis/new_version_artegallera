@@ -1,0 +1,222 @@
+@layout()
+  <div class="admin-page">
+    @include('partials/admin_nav')
+    <div class="admin-heading">
+      <div>
+        <a class="admin-link" href="/admin/users">← Volver a usuarios</a>
+        <p class="admin-kicker">Detalle de usuario</p>
+        <h1>{{ user.full_name || user.email }}</h1>
+        <p class="admin-muted">{{ user.email }}</p>
+      </div>
+      <span class="admin-status admin-status-{{ user.status }}">{{ user.status }}</span>
+    </div>
+
+    <section class="admin-grid">
+      <div class="admin-card">
+        <p class="admin-kicker">Cuenta</p>
+        <dl class="admin-dl">
+          <dt>Usuario</dt>
+          <dd>{{ user.username || '—' }}</dd>
+          <dt>Roles</dt>
+          <dd>{{ user.roles || '—' }}</dd>
+          <dt>Apuestas habilitadas</dt>
+          <dd>{{ user.is_betting_enabled ? 'Sí' : 'No' }}</dd>
+          <dt>Último acceso</dt>
+          <dd>{{ user.last_access_at || '—' }}</dd>
+          <dt>Registro</dt>
+          <dd>{{ user.created_at }}</dd>
+        </dl>
+        @if(user.status !== 'blocked')
+          @form({ route: 'admin.users.betting', routeParams: { id: user.id }, method: 'POST' })
+            <label class="admin-confirm-check">
+              <input type="checkbox" name="confirmed" value="1" required />
+              Confirmo alternar el acceso a apuestas
+            </label>
+            <button type="submit">
+              {{ user.is_betting_enabled ? 'Deshabilitar apuestas' : 'Habilitar apuestas' }}
+            </button>
+          @end
+        @end
+      </div>
+
+      <div class="admin-card">
+        <p class="admin-kicker">Cambiar estado</p>
+        <h2>Estado de la cuenta</h2>
+        <p class="admin-muted">
+          Escribe el correo exacto del usuario para confirmar. La acción queda registrada en auditoría.
+        </p>
+        @form({ route: 'admin.users.status', routeParams: { id: user.id }, method: 'POST' })
+          <select name="action" required>
+            <option value="suspend" @if(user.status === 'active') selected @end>Suspend</option>
+            <option value="block" @if(user.status === 'suspended') selected @end>Bloquear</option>
+            <option value="activate" @if(user.status === 'suspended' || user.status === 'blocked') selected @end>Activar</option>
+          </select>
+          <label>
+            Correo de confirmación
+            <input name="confirmation" type="email" required placeholder="{{ user.email }}" />
+          </label>
+          <label class="admin-confirm-check">
+            <input type="checkbox" name="confirmed" value="1" required />
+            He verificado la identidad del usuario
+          </label>
+          <button type="submit">Aplicar estado</button>
+        @end
+      </div>
+
+      <div class="admin-card">
+        <p class="admin-kicker">Roles</p>
+        <h2>Asignación de rol</h2>
+        @form({ route: 'admin.users.role', routeParams: { id: user.id }, method: 'POST' })
+          <select name="roleCode" required>
+            @each(role in user.allRoles)
+              <option value="{{ role.code }}">{{ role.name }}</option>
+            @end
+          </select>
+          <label class="admin-confirm-check">
+            <input type="checkbox" name="confirmed" value="1" required />
+            Confirmo el cambio de rol (se alterna si ya está asignado)
+          </label>
+          <button type="submit">Alternar rol</button>
+        @end
+      </div>
+
+      <div class="admin-card">
+        <p class="admin-kicker">Wallet</p>
+        <h2>Ajustar balance</h2>
+        <p class="admin-muted">Requiere doble confirmación con el correo del usuario.</p>
+        @form({ route: 'admin.wallets.adjust', method: 'POST' })
+          <input type="hidden" name="userId" value="{{ user.id }}" />
+          <select name="direction" required>
+            <option value="credit">Acreditar</option>
+            <option value="debit">Debitar</option>
+          </select>
+          <label>
+            Monto
+            <input name="amount" type="text" inputmode="decimal" required placeholder="0.00" />
+          </label>
+          <label>
+            Motivo
+            <input name="description" maxlength="255" placeholder="Descripción del ajuste" />
+          </label>
+          <label>
+            Correo de confirmación
+            <input name="confirmation" type="email" required placeholder="{{ user.email }}" />
+          </label>
+          <label class="admin-confirm-check">
+            <input type="checkbox" name="confirmed" value="1" required />
+            Confirmo este ajuste de saldo
+          </label>
+          <button type="submit">Aplicar ajuste</button>
+        @end
+      </div>
+    </section>
+
+    <section class="admin-grid">
+      <div class="admin-card">
+        <p class="admin-kicker">Saldo</p>
+        <h2>Wallet</h2>
+        @if(user.wallet)
+          <dl class="admin-dl">
+            <dt>Disponible</dt>
+            <dd>{{ user.wallet.available_balance }}</dd>
+            <dt>En espera</dt>
+            <dd>{{ user.wallet.held_balance }}</dd>
+            <dt>Total</dt>
+            <dd>{{ user.wallet.available_balance + user.wallet.held_balance }}</dd>
+          </dl>
+        @else
+          <p class="admin-muted">Sin wallet.</p>
+        @end
+      </div>
+
+      <div class="admin-card">
+        <p class="admin-kicker">Apuestas</p>
+        <h2>Resumen</h2>
+        <dl class="admin-dl">
+          <dt>Apuestas</dt>
+          <dd>{{ user.betStats.total }}</dd>
+          <dt>Ganadas</dt>
+          <dd>{{ user.betStats.won }}</dd>
+          <dt>Apostado</dt>
+          <dd>{{ user.betStats.wagered }}</dd>
+          <dt>Premios</dt>
+          <dd>{{ user.betStats.payouts }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="admin-card admin-table-card">
+      <div class="admin-card-heading">
+        <div>
+          <p class="admin-kicker">Movimientos</p>
+          <h2>Últimos movimientos de wallet</h2>
+        </div>
+      </div>
+      @if(user.transactions.length === 0)
+        <p class="admin-muted">Sin movimientos.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Tipo</th>
+              <th>Monto</th>
+              <th>Antes</th>
+              <th>Después</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(tx in user.transactions)
+              <tr>
+                <td>{{ tx.id }}</td>
+                <td>{{ tx.type }}</td>
+                <td>{{ tx.amount }}</td>
+                <td>{{ tx.balance_before }}</td>
+                <td>{{ tx.balance_after }}</td>
+                <td>{{ tx.created_at }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+
+    <section class="admin-card admin-table-card">
+      <div class="admin-card-heading">
+        <div>
+          <p class="admin-kicker">Historial</p>
+          <h2>Últimas apuestas</h2>
+        </div>
+      </div>
+      @if(user.recentBets.length === 0)
+        <p class="admin-muted">Sin apuestas.</p>
+      @else
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Evento</th>
+              <th>Ronda</th>
+              <th>Lado</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(bet in user.recentBets)
+              <tr>
+                <td>{{ bet.event_name }}</td>
+                <td>{{ bet.round_number }}</td>
+                <td>{{ bet.side_name }}</td>
+                <td>{{ bet.amount }}</td>
+                <td>{{ bet.status }}</td>
+                <td>{{ bet.placed_at }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      @end
+    </section>
+  </div>
+@end
