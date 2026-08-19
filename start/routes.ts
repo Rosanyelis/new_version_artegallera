@@ -74,6 +74,26 @@ router
     apiThrottle,
   ])
 
+router.get('/api/v1/events', [() => import('#controllers/event_controller'), 'index'])
+router.get('/api/v1/events/:slug', [() => import('#controllers/event_controller'), 'show'])
+
+router
+  .group(() => {
+    router.post('/', [() => import('#controllers/event_controller'), 'create'])
+    router.post('/:id/state/:action', [() => import('#controllers/event_controller'), 'transition'])
+    router.post('/:eventId/rounds', [() => import('#controllers/event_controller'), 'createRound'])
+    router.post('/rounds/:id/state/:action', [
+      () => import('#controllers/event_controller'),
+      'transitionRound',
+    ])
+  })
+  .prefix('/api/v1/admin/events')
+  .use([
+    middleware.apiAuth(),
+    middleware.permission({ permissions: ['events.manage'] }),
+    apiThrottle,
+  ])
+
 router
   .get('/api/v1/admin/access-check', [
     () => import('#controllers/admin_access_controller'),
@@ -84,3 +104,36 @@ router
     middleware.permission({ permissions: ['admin.access'] }),
     apiThrottle,
   ])
+
+router
+  .group(() => {
+    router
+      .get('/', [() => import('#controllers/admin_controller'), 'dashboard'])
+      .as('admin.dashboard')
+    router
+      .get('/events/:slug', [() => import('#controllers/admin_controller'), 'event'])
+      .as('admin.event')
+    router
+      .post('/events', [() => import('#controllers/admin_controller'), 'storeEvent'])
+      .as('admin.events.store')
+    router
+      .post('/events/:eventId/:slug/rounds', [
+        () => import('#controllers/admin_controller'),
+        'storeRound',
+      ])
+      .as('admin.rounds.store')
+    router
+      .post('/events/:id/state/:action', [
+        () => import('#controllers/admin_controller'),
+        'transitionEvent',
+      ])
+      .as('admin.events.transition')
+    router
+      .post('/events/:slug/rounds/:id/state/:action', [
+        () => import('#controllers/admin_controller'),
+        'transitionRound',
+      ])
+      .as('admin.rounds.transition')
+  })
+  .prefix('/admin')
+  .use([middleware.auth(), middleware.adminPermission()])

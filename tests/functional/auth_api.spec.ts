@@ -3,6 +3,9 @@ import User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import WalletService from '#services/wallet_service'
 import { InsufficientFundsError } from '#exceptions/wallet'
+import EventService from '#services/event_service'
+import RoundService from '#services/round_service'
+import InvalidStateTransitionError from '#exceptions/state_transition'
 import { createHash, randomBytes } from 'node:crypto'
 import { DateTime } from 'luxon'
 
@@ -183,5 +186,36 @@ test.group('Authentication API', () => {
     assert.equal(results.filter((result) => result.status === 'rejected').length, 1)
     const balance = await wallet.getBalance(user.id)
     assert.equal(balance.availableBalance, '0.00')
+  })
+
+  test('enforces event and round state machines', async ({ assert }) => {
+    const user = await User.create({
+      fullName: 'Operator User',
+      email: `operator-${Date.now()}@example.com`,
+      password: 'OperatorPassword123!',
+      status: 'active',
+      isBettingEnabled: false,
+    })
+    const events = new EventService()
+    const rounds = new RoundService()
+    const event = await events.create({ name: `Jornada ${Date.now()}` }, user.id)
+
+    await assert.rejects(
+      () => events.transition(event.id, 'live', user.id),
+      InvalidStateTransitionError
+    )
+    await events.transition(event.id, 'scheduled', user.id)
+    await events.transition(event.id, 'live', user.id)
+
+    const round = await rounds.create(event.id, 1, user.id)
+    await rounds.transition(round.id, 'betting_open', user.id)
+    await rounds.transition(round.id, 'betting_closed', user.id)
+    await rounds.transition(round.id, 'in_progress', user.id)
+    const sides = await db.from('betting_sides').where('round_id', round.id).orderBy('id', 'asc')
+    await rounds.transition(round.id, 'settling', user.id, sides[0].id)
+    const settled = await rounds.transition(round.id, 'settled', user.id)
+
+    assert.equal(settled.status, 'settled')
+    assert.equal(settled.winning_side_id, sides[0].id)
   })
 })

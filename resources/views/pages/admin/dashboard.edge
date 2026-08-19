@@ -1,0 +1,110 @@
+@layout()
+  <div class="admin-page">
+    <div class="admin-heading">
+      <div>
+        <p class="admin-kicker">Operaciones</p>
+        <h1>Panel administrativo</h1>
+        <p class="admin-muted">Gestiona jornadas y controla el ciclo de cada evento.</p>
+      </div>
+      <span class="admin-badge">{{ events.length }} eventos</span>
+    </div>
+
+    <section class="admin-grid">
+      <div class="admin-card">
+        <p class="admin-kicker">Nuevo evento</p>
+        <h2>Crear jornada</h2>
+        @form({ route: 'admin.events.store', method: 'POST' })
+          <label>
+            Nombre
+            <input name="name" required placeholder="Jornada del sábado" />
+          </label>
+          <label>
+            Slug opcional
+            <input name="slug" placeholder="jornada-sabado" />
+          </label>
+          <label>
+            Ubicación
+            <input name="location" placeholder="Palenque principal" />
+          </label>
+          <label>
+            Fecha programada
+            <input name="scheduledAt" type="datetime-local" />
+          </label>
+          <label>
+            Descripción
+            <textarea name="description" rows="3"></textarea>
+          </label>
+          <button type="submit">Guardar como borrador</button>
+        @end
+      </div>
+
+      <div class="admin-card admin-events-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Agenda</p>
+            <h2>Eventos</h2>
+          </div>
+        </div>
+        @if(events.length === 0)
+          <p class="admin-muted">Todavía no hay eventos creados.</p>
+        @else
+          <div class="admin-event-list">
+            @each(event in events)
+              <article class="admin-event-row">
+                <div>
+                  <span class="admin-status admin-status-{{ event.status }}">
+                    {{ event.status }}
+                  </span>
+                  <h3><a href="/admin/events/{{ event.slug }}">{{ event.name }}</a></h3>
+                  <p>
+                    {{ event.location || 'Sin ubicación' }}
+                    ·
+                    {{ event.scheduled_at || 'Sin fecha' }}
+                  </p>
+                </div>
+                <div class="admin-actions">
+                  <a class="admin-link" href="/admin/events/{{ event.slug }}">Operar</a>
+                  @if(event.status === 'draft')
+                    @form({
+                      route: 'admin.events.transition',
+                      routeParams: { id: event.id, action: 'scheduled' },
+                      method: 'POST',
+                    })
+                      <button class="admin-button admin-button-muted" type="submit">
+                        Programar
+                      </button>
+                    @end
+                  @elseif(event.status === 'scheduled')
+                    @form({
+                      route: 'admin.events.transition',
+                      routeParams: { id: event.id, action: 'live' },
+                      method: 'POST',
+                    })
+                      <button class="admin-button" type="submit">Iniciar</button>
+                    @end
+                  @elseif(event.status === 'live')
+                    @form({
+                      route: 'admin.events.transition',
+                      routeParams: { id: event.id, action: 'paused' },
+                      method: 'POST',
+                    })
+                      <button class="admin-button admin-button-muted" type="submit">Pausar</button>
+                    @end
+                  @elseif(event.status === 'paused')
+                    @form({
+                      route: 'admin.events.transition',
+                      routeParams: { id: event.id, action: 'live' },
+                      method: 'POST',
+                    })
+                      <button class="admin-button" type="submit">Reanudar</button>
+                    @end
+                  @end
+                </div>
+              </article>
+            @end
+          </div>
+        @end
+      </div>
+    </section>
+  </div>
+@end

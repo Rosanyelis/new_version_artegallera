@@ -234,3 +234,199 @@ button:hover {
     transform: scale(1);
   }
 }
+
+/* Admin */
+.admin-page {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 58px 0 90px;
+}
+.admin-heading,
+.admin-card-heading,
+.admin-event-row,
+.admin-round-row,
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.admin-heading {
+  margin-bottom: 34px;
+}
+.admin-heading h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(32px, 5vw, 54px);
+  letter-spacing: -1.8px;
+}
+.admin-kicker {
+  color: #8b641f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.admin-muted {
+  color: var(--gray-6);
+}
+.admin-badge,
+.admin-status,
+.admin-side {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.admin-badge {
+  padding: 7px 12px;
+  color: #765118;
+  background: #f8edd4;
+  white-space: nowrap;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  gap: 20px;
+}
+.admin-card {
+  padding: 26px;
+  background: #fff;
+  border: 1px solid var(--gray-3);
+  border-radius: 12px;
+}
+.admin-card h2 {
+  margin: 5px 0 22px;
+  font-size: 26px;
+  letter-spacing: -0.8px;
+}
+.admin-card form {
+  gap: 15px;
+}
+.admin-card label {
+  color: var(--gray-8);
+}
+.admin-card input,
+.admin-card textarea,
+.admin-card select {
+  margin-top: 6px;
+  width: 100%;
+}
+.admin-card button,
+.admin-toolbar button,
+.admin-actions button {
+  width: auto;
+  padding: 9px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.admin-events-card {
+  min-width: 0;
+}
+.admin-event-list,
+.admin-round-list {
+  border-top: 1px solid var(--gray-3);
+}
+.admin-event-row,
+.admin-round-row {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--gray-3);
+}
+.admin-event-row:last-child,
+.admin-round-row:last-child {
+  border-bottom: 0;
+}
+.admin-event-row h3,
+.admin-round-row h3 {
+  margin: 5px 0;
+  font-size: 18px;
+}
+.admin-event-row p {
+  color: var(--gray-6);
+  font-size: 13px;
+}
+.admin-status {
+  padding: 4px 8px;
+  color: var(--gray-7);
+  background: var(--gray-2);
+}
+.admin-status-live,
+.admin-status-betting_open,
+.admin-status-in_progress {
+  color: #17683b;
+  background: #e1f4e8;
+}
+.admin-status-finished,
+.admin-status-settled {
+  color: #365d8a;
+  background: #e5eef9;
+}
+.admin-status-cancelled {
+  color: #a32929;
+  background: #fbe6e6;
+}
+.admin-actions,
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-actions-wrap {
+  align-items: flex-end;
+  flex-direction: column;
+}
+.admin-link {
+  color: #8b641f;
+  font-size: 12px;
+  font-weight: 700;
+}
+.admin-button-muted {
+  background: var(--gray-8);
+}
+.admin-button-danger {
+  background: #a32929;
+}
+.admin-sides {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.admin-side {
+  padding: 4px 8px;
+  color: #fff;
+  font-size: 10px;
+}
+.admin-side-red {
+  background: #bd3b3b;
+}
+.admin-side-green {
+  background: #28764d;
+}
+.admin-toolbar {
+  justify-content: flex-start;
+  margin: -12px 0 28px;
+}
+
+@media (max-width: 760px) {
+  .admin-page {
+    width: min(100% - 30px, 1180px);
+    padding-top: 30px;
+  }
+  .admin-heading,
+  .admin-event-row,
+  .admin-round-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-actions-wrap {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

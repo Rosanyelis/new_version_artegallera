@@ -42,15 +42,15 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 3: eventos, rondas y panel operativo
 
-- [ ] Crear migraciones y modelos de `events`, `rounds` y `betting_sides`.
-- [ ] Implementar máquina de estados y transiciones válidas en `EventService`/`RoundService`.
-- [ ] Crear CRUD de eventos, rondas y lados con policies y auditoría.
-- [ ] Construir layout Edge del panel y dashboard de indicadores.
-- [ ] Construir pantalla de operación con abrir/cerrar apuestas, iniciar ronda, registrar ganador y finalizar evento.
-- [ ] Añadir endpoints públicos de eventos destacados, próximos, activos y resultados.
-- [ ] Cubrir transiciones inválidas y permisos del operador.
+- [x] Crear migraciones y modelos de `events`, `rounds` y `betting_sides`.
+- [x] Implementar máquina de estados y transiciones válidas en `EventService`/`RoundService`.
+- [x] Crear operaciones de eventos, rondas y lados con autorización y auditoría.
+- [x] Construir layout Edge del panel y dashboard operativo bajo `/admin`.
+- [x] Construir pantalla de operación con abrir/cerrar apuestas, iniciar ronda, registrar ganador y finalizar evento.
+- [x] Añadir endpoints públicos de eventos destacados, próximos, activos y resultados.
+- [x] Cubrir transiciones inválidas y permisos del operador.
 
-**Criterio:** el operador puede ejecutar una jornada sin editar estados directamente en base de datos.
+**Criterio:** cumplido; el operador ejecuta el ciclo evento/ronda desde Edge o API, sin editar estados directamente en base de datos.
 
 ## Fase 4: apuestas y liquidación
 

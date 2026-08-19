@@ -1,0 +1,168 @@
+@layout()
+  <div class="admin-page">
+    <div class="admin-heading">
+      <div>
+        <a class="admin-link" href="/admin">← Volver al panel</a>
+        <p class="admin-kicker">Operación de evento</p>
+        <h1>{{ event.name }}</h1>
+        <p class="admin-muted">
+          {{ event.location || 'Sin ubicación' }}
+          · Estado:
+          {{ event.status }}
+        </p>
+      </div>
+      <span class="admin-badge admin-status-{{ event.status }}">{{ event.status }}</span>
+    </div>
+
+    <section class="admin-toolbar">
+      @if(event.status === 'draft')
+        @form({
+          route: 'admin.events.transition',
+          routeParams: { id: event.id, action: 'scheduled' },
+          method: 'POST',
+        })
+          <button type="submit">Programar evento</button>
+        @end
+      @elseif(event.status === 'scheduled')
+        @form({
+          route: 'admin.events.transition',
+          routeParams: { id: event.id, action: 'live' },
+          method: 'POST',
+        })
+          <button type="submit">Iniciar evento</button>
+        @end
+      @elseif(event.status === 'live')
+        @form({
+          route: 'admin.events.transition',
+          routeParams: { id: event.id, action: 'paused' },
+          method: 'POST',
+        })
+          <button class="admin-button admin-button-muted" type="submit">Pausar evento</button>
+        @end
+      @elseif(event.status === 'paused')
+        @form({
+          route: 'admin.events.transition',
+          routeParams: { id: event.id, action: 'live' },
+          method: 'POST',
+        })
+          <button type="submit">Reanudar evento</button>
+        @end
+      @end
+      @if(event.status === 'live' || event.status === 'paused')
+        @form({
+          route: 'admin.events.transition',
+          routeParams: { id: event.id, action: 'finished' },
+          method: 'POST',
+        })
+          <button class="admin-button admin-button-danger" type="submit">Finalizar evento</button>
+        @end
+      @end
+    </section>
+
+    <section class="admin-grid">
+      <div class="admin-card">
+        <p class="admin-kicker">Nueva ronda</p>
+        <h2>Agregar ronda</h2>
+        @form({
+          route: 'admin.rounds.store',
+          routeParams: { eventId: event.id, slug: event.slug },
+          method: 'POST',
+        })
+          <label>
+            Número de ronda
+            <input name="roundNumber" type="number" min="1" required />
+          </label>
+          <button type="submit">Crear ronda</button>
+        @end
+      </div>
+
+      <div class="admin-card admin-events-card">
+        <div class="admin-card-heading">
+          <div>
+            <p class="admin-kicker">Ciclo operativo</p>
+            <h2>Rondas</h2>
+          </div>
+          <span class="admin-badge">{{ event.betting_status }}</span>
+        </div>
+        @if(event.rounds.length === 0)
+          <p class="admin-muted">Crea la primera ronda para comenzar.</p>
+        @else
+          <div class="admin-round-list">
+            @each(round in event.rounds)
+              <article class="admin-round-row">
+                <div>
+                  <span class="admin-kicker">Ronda {{ round.round_number }}</span>
+                  <h3>{{ round.status }}</h3>
+                  <div class="admin-sides">
+                    @each(side in round.bettingSides)
+                      <span class="admin-side admin-side-{{ side.color }}">{{ side.name }}</span>
+                    @end
+                  </div>
+                </div>
+                <div class="admin-actions admin-actions-wrap">
+                  @if(round.status === 'pending')
+                    @form({
+                      route: 'admin.rounds.transition',
+                      routeParams: {
+                        slug: event.slug,
+                        id: round.id,
+                        action: 'betting_open',
+                      },
+                      method: 'POST',
+                    })
+                      <button type="submit">Abrir apuestas</button>
+                    @end
+                  @elseif(round.status === 'betting_open')
+                    @form({
+                      route: 'admin.rounds.transition',
+                      routeParams: {
+                        slug: event.slug,
+                        id: round.id,
+                        action: 'betting_closed',
+                      },
+                      method: 'POST',
+                    })
+                      <button class="admin-button admin-button-muted" type="submit">
+                        Cerrar apuestas
+                      </button>
+                    @end
+                  @elseif(round.status === 'betting_closed')
+                    @form({
+                      route: 'admin.rounds.transition',
+                      routeParams: { slug: event.slug, id: round.id, action: 'in_progress' },
+                      method: 'POST',
+                    })
+                      <button type="submit">Iniciar ronda</button>
+                    @end
+                  @elseif(round.status === 'in_progress')
+                    @form({
+                      route: 'admin.rounds.transition',
+                      routeParams: { slug: event.slug, id: round.id, action: 'settling' },
+                      method: 'POST',
+                    })
+                      <select name="winningSideId" required>
+                        <option value="">Seleccionar ganador</option>
+                        @each(side in round.bettingSides)
+                          <option value="{{ side.id }}">{{ side.name }}</option>
+                        @end
+                      </select>
+                      <button type="submit">Registrar ganador</button>
+                    @end
+                  @elseif(round.status === 'settling')
+                    @form({
+                      route: 'admin.rounds.transition',
+                      routeParams: { slug: event.slug, id: round.id, action: 'settled' },
+                      method: 'POST',
+                    })
+                      <button type="submit">Liquidar ronda</button>
+                    @end
+                  @end
+                </div>
+              </article>
+            @end
+          </div>
+        @end
+      </div>
+    </section>
+  </div>
+@end

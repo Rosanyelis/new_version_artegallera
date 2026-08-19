@@ -28,6 +28,8 @@ La recuperación de contraseña usa Resend y expone `POST /api/v1/auth/forgot-pa
 
 La wallet expone `GET /api/v1/wallet` y `GET /api/v1/wallet/transactions`. Los ajustes administrativos usan `POST /api/v1/admin/wallets/adjust` con permisos, clave de idempotencia y auditoría.
 
+El panel operativo Edge está disponible en `/admin` para usuarios con el permiso `admin.access`. Desde allí se crean eventos, rondas y se ejecutan sus transiciones operativas.
+
 Para ejecutar únicamente el servidor Vite del cliente durante desarrollo:
 
 ```sh

@@ -43,6 +43,87 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BettingSideSchema extends BaseModel {
+  static $columns = [
+    'code',
+    'color',
+    'createdAt',
+    'eventId',
+    'id',
+    'metadata',
+    'name',
+    'roundId',
+    'updatedAt',
+  ] as const
+  $columns = BettingSideSchema.$columns
+  @column()
+  declare code: string
+  @column()
+  declare color: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare eventId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare metadata: any | null
+  @column()
+  declare name: string
+  @column()
+  declare roundId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class EventSchema extends BaseModel {
+  static $columns = [
+    'bettingStatus',
+    'coverImage',
+    'createdAt',
+    'description',
+    'id',
+    'isFeatured',
+    'location',
+    'name',
+    'playbackUrl',
+    'scheduledAt',
+    'slug',
+    'status',
+    'streamStatus',
+    'updatedAt',
+  ] as const
+  $columns = EventSchema.$columns
+  @column()
+  declare bettingStatus: string
+  @column()
+  declare coverImage: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isFeatured: boolean
+  @column()
+  declare location: string | null
+  @column()
+  declare name: string
+  @column()
+  declare playbackUrl: string | null
+  @column.dateTime()
+  declare scheduledAt: DateTime | null
+  @column()
+  declare slug: string
+  @column()
+  declare status: string
+  @column()
+  declare streamStatus: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class PasswordResetTokenSchema extends BaseModel {
   static $columns = ['createdAt', 'expiresAt', 'id', 'tokenHash', 'usedAt', 'userId'] as const
   $columns = PasswordResetTokenSchema.$columns
@@ -101,6 +182,57 @@ export class RoleSchema extends BaseModel {
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class RoundSchema extends BaseModel {
+  static $columns = [
+    'bettingClosedAt',
+    'bettingStatus',
+    'createdAt',
+    'eventId',
+    'finishedAt',
+    'id',
+    'openedAt',
+    'roundNumber',
+    'startedAt',
+    'status',
+    'totalGreen',
+    'totalPool',
+    'totalRed',
+    'updatedAt',
+    'winningSideId',
+  ] as const
+  $columns = RoundSchema.$columns
+  @column.dateTime()
+  declare bettingClosedAt: DateTime | null
+  @column()
+  declare bettingStatus: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare eventId: number
+  @column.dateTime()
+  declare finishedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare openedAt: DateTime | null
+  @column()
+  declare roundNumber: number
+  @column.dateTime()
+  declare startedAt: DateTime | null
+  @column()
+  declare status: string
+  @column()
+  declare totalGreen: string
+  @column()
+  declare totalPool: string
+  @column()
+  declare totalRed: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare winningSideId: number | null
 }
 
 export class UserRoleSchema extends BaseModel {
