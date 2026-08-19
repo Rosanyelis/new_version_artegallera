@@ -1,0 +1,56 @@
+:root {
+  --ink: #f7f1e5;
+  --muted: #adab9e;
+  --surface: #171a18;
+  --line: rgba(247, 241, 229, 0.14);
+  --accent: #d5a34a;
+  --accent-strong: #f0c36c;
+}
+
+#client-app { min-height: 100vh; }
+.client-shell {
+  min-height: 100vh;
+  color: var(--ink);
+  background: radial-gradient(circle at 78% 15%, rgba(152, 96, 42, 0.26), transparent 31rem), radial-gradient(circle at 0% 54%, rgba(56, 94, 73, 0.24), transparent 28rem), #101310;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.client-header, .client-footer, .client-hero, .event-preview { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+.client-header { display: flex; align-items: center; justify-content: space-between; padding: 26px 0; border-bottom: 1px solid var(--line); }
+.brand, .client-header nav, .hero-actions, .event-card, .client-footer { display: flex; align-items: center; }
+.brand { gap: 11px; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.03em; }
+.brand-mark { display: grid; width: 34px; height: 34px; place-items: center; color: #101310; background: var(--accent); border-radius: 50%; font-family: Arial, sans-serif; font-size: 0.68rem; font-weight: 800; }
+.client-header nav { gap: 26px; color: var(--muted); font-family: Arial, sans-serif; font-size: 0.82rem; }
+.client-header a:hover, .event-card-content a:hover { color: var(--accent-strong); }
+.nav-login { padding: 9px 15px; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; }
+.client-hero { padding: 116px 0 130px; }
+.eyebrow { margin-bottom: 16px; color: var(--accent-strong); font-family: Arial, sans-serif; font-size: 0.69rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+.client-hero h1, .placeholder-page h1 { max-width: 760px; color: var(--ink); font-size: clamp(3.3rem, 8vw, 6.8rem); font-weight: 400; letter-spacing: -0.065em; line-height: 0.94; }
+.hero-copy { max-width: 480px; margin-top: 30px; color: var(--muted); font-size: 1.17rem; line-height: 1.65; }
+.hero-actions { gap: 13px; margin-top: 38px; font-family: Arial, sans-serif; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 45px; padding: 0 20px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+.button-primary { color: #15150f; background: var(--accent); }
+.button-primary:hover { background: var(--accent-strong); }
+.button-quiet { color: var(--ink); border: 1px solid var(--line); }
+.event-preview { padding-bottom: 100px; }
+.event-preview h2 { margin-bottom: 27px; color: var(--ink); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; }
+.event-card { min-height: 220px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+.event-card-art { display: grid; width: 35%; min-height: 220px; place-items: center; color: rgba(247, 241, 229, 0.12); background: linear-gradient(145deg, #304537, #17221b 65%); font-size: clamp(2rem, 7vw, 6rem); font-weight: 700; letter-spacing: -0.1em; }
+.event-card-content { padding: 32px 38px; }
+.status-pill { color: var(--accent-strong); font-family: Arial, sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.event-card h3 { margin: 12px 0 8px; color: var(--ink); font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 400; }
+.event-card p, .placeholder-page p { color: var(--muted); }
+.event-card-content a { display: inline-block; margin-top: 21px; color: var(--accent-strong); font-family: Arial, sans-serif; font-size: 0.76rem; font-weight: 700; }
+.placeholder-page { min-height: 66vh; padding: 110px 0; }
+.placeholder-page p { max-width: 430px; margin: 28px 0; font-size: 1.15rem; }
+.client-footer { justify-content: space-between; padding: 24px 0 30px; color: var(--muted); border-top: 1px solid var(--line); font-family: Arial, sans-serif; font-size: 0.7rem; }
+@media (max-width: 620px) {
+  .client-header, .client-footer, .client-hero, .event-preview { width: min(100% - 30px, 1160px); }
+  .client-hero { padding: 84px 0 95px; }
+  .client-header nav { gap: 12px; }
+  .client-header nav a:first-child { display: none; }
+  .event-card { display: block; }
+  .event-card-art { width: 100%; min-height: 120px; }
+  .event-card-content { padding: 25px; }
+  .client-footer { display: block; }
+  .client-footer span:last-child { display: block; margin-top: 8px; }
+}
