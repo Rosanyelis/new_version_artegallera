@@ -22,6 +22,10 @@ npm run dev
 
 La aplicación queda disponible en `http://localhost:3333`. El panel administrativo se implementará bajo `/admin` en la siguiente fase.
 
+El PostgreSQL local usa el puerto `5433` para evitar conflictos con otras instalaciones. El limiter usa memoria en `.env` de desarrollo y Redis debe configurarse como `LIMITER_STORE=redis` en entornos distribuidos.
+
+La recuperación de contraseña usa Resend y expone `POST /api/v1/auth/forgot-password` y `POST /api/v1/auth/reset-password`. El API nunca devuelve el token; solo se almacena su hash y vence después de 60 minutos.
+
 Para ejecutar únicamente el servidor Vite del cliente durante desarrollo:
 
 ```sh

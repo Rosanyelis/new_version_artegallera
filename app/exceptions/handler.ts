@@ -34,6 +34,21 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (ctx.request.url().startsWith('/api/')) {
+      const exception = error as { status?: number; code?: string; message?: string }
+      const status = exception.status && exception.status >= 400 ? exception.status : 500
+
+      return ctx.response.status(status).json({
+        error: {
+          code: status >= 500 ? 'INTERNAL_ERROR' : exception.code || 'REQUEST_ERROR',
+          message:
+            status >= 500
+              ? 'Ocurrió un error interno.'
+              : exception.message || 'La solicitud no es válida.',
+        },
+      })
+    }
+
     return super.handle(error, ctx)
   }
 

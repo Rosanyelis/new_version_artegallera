@@ -45,7 +45,15 @@ const shieldConfig = defineConfig({
      * Routes that should be excluded from CSRF protection.
      * Useful for webhooks or API endpoints that use other auth methods.
      */
-    exceptRoutes: [],
+    // The same-origin React client uses the session cookie and will receive
+    // API-specific auth errors instead of an HTML redirect.
+    exceptRoutes: [
+      '/api/v1/auth/register',
+      '/api/v1/auth/login',
+      '/api/v1/auth/logout',
+      '/api/v1/auth/forgot-password',
+      '/api/v1/auth/reset-password',
+    ],
 
     /**
      * Enable XSRF-TOKEN cookie for JavaScript frameworks.

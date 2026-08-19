@@ -16,15 +16,17 @@ Las tareas están ordenadas por dependencia. Cada fase debe cerrar sus criterios
 
 ## Fase 1: base de backend y seguridad
 
-- [ ] Crear configuración de base de datos, Redis, sesiones, correo y logging.
-- [ ] Implementar migraciones de usuarios, roles, permisos y asignaciones.
-- [ ] Implementar registro, login, logout, recuperación, verificación de correo y sesiones.
-- [ ] Crear middleware de autenticación, autorización por permisos y estados de usuario.
-- [ ] Crear validators VineJS, manejo de errores de dominio y respuesta API consistente.
-- [ ] Añadir rate limiting, request/correlation ID y endpoints `/health` y `/ready`.
-- [ ] Cubrir autenticación y permisos con tests funcionales.
+- [x] Crear configuración de base de datos PostgreSQL, Redis, sesiones y logging.
+- [x] Implementar migraciones de usuarios, roles, permisos y asignaciones.
+- [x] Implementar registro, login, logout y sesiones para web y API.
+- [x] Implementar recuperación de contraseña mediante Resend y token de un solo uso.
+- [ ] Implementar verificación de correo cuando se defina el flujo de activación de cuentas.
+- [x] Crear middleware de autenticación, autorización por permisos y estados de usuario.
+- [x] Crear validators VineJS, manejo de errores de dominio y respuesta API consistente.
+- [x] Añadir rate limiting, request/correlation ID y endpoints `/health` y `/ready`.
+- [x] Cubrir autenticación, readiness y permisos con tests funcionales.
 
-**Criterio:** un usuario puede autenticarse; un operador solo accede a las acciones permitidas; errores internos no se exponen.
+**Criterio:** cumplido para registro/login/logout/sesiones, recuperación con Resend, roles/permisos y errores API; verificación de correo queda pendiente del flujo de activación de cuentas.
 
 ## Fase 2: wallet, ledger y auditoría
 

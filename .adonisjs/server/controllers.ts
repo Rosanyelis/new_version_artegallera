@@ -4,6 +4,9 @@
  */
 
 export const controllers = {
+  AdminAccess: () => import('#controllers/admin_access_controller'),
+  ApiAuth: () => import('#controllers/api_auth_controller'),
+  Health: () => import('#controllers/health_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
 }
